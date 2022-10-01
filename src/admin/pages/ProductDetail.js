@@ -54,6 +54,10 @@ const ProductDetail = () => {
       name: "Long Description",
       sort: "longDes",
     },
+    {
+      name: "Activate",
+      sort: "is_Published",
+    },
   ];
 
   const [productDetail, setProductDetail] = useState([]);
@@ -61,6 +65,7 @@ const ProductDetail = () => {
 
   const [page, setPage] = useState(0);
   const [pageLength, setPageLength] = useState(5);
+  const admin = true;
   const [sort, setSort] = useState("");
   const [priceTo, setPriceTo] = useState();
   const [priceFrom, setPriceFrom] = useState();
@@ -71,6 +76,7 @@ const ProductDetail = () => {
     ProductDetailService.getPaging(
       page,
       pageLength,
+      admin,
       sort,
       priceFrom,
       priceTo,
@@ -287,7 +293,7 @@ const ProductDetail = () => {
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageLength, search, sort]);
+  }, [page, pageLength, admin, search, sort]);
 
   const handleChangePageLength = (e) => {
     setPage(0);
@@ -544,6 +550,13 @@ const ProductDetail = () => {
                   <td>{list.type.Pro_Type}</td>
                   <td dangerouslySetInnerHTML={{ __html: list.shortDes }}></td>
                   <td dangerouslySetInnerHTML={{ __html: list.longDes }} />
+                  <td>
+                    {list.is_Published === 1 ? (
+                      <i class="bi bi-check text-primary fs-3"></i>
+                    ) : (
+                      <i class="bi bi-x text-danger fs-3"></i>
+                    )}
+                  </td>
                   <td>
                     <a
                       href="/#"

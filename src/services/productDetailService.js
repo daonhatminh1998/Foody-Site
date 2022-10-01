@@ -1,10 +1,13 @@
 import api from "./api";
 const list = () => api.get(api.url.productDetail);
 
-const getPaging = (p, r, s, from, to, q) => {
+const getPaging = (p, r, admin, s, from, to, q) => {
   let queryString = `p=${p}&r=${r}`;
   if (s) {
     queryString += `&s=${s}`;
+  }
+  if (admin) {
+    queryString += `&a=${admin}`;
   }
   if (to) {
     queryString += `&to=${to}`;
