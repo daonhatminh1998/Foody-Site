@@ -350,7 +350,6 @@ const ProductDetail = () => {
 
     onSubmit: (values) => {
       handleFormSubmit(values);
-      // handleImageUpload();
     },
   });
 
@@ -382,41 +381,49 @@ const ProductDetail = () => {
 
   const showEditModal = (e, ProDe_Id) => {
     if (e) e.preventDefault();
-    // console.log(ProductDetailService.getAvatar(ProDe_Id));
-    // if (ProDe_Id > 0) {
-    //   const avatarReq = ProductDetailService.getAvatarUrl(ProDe_Id);
-    //   const productReq = ProductDetailService.get(ProDe_Id);
-    //   api.promise([avatarReq, productReq]).then(
-    //     api.spread((...res) => {
-    //       if (res[0].size > 0) setImagePreview(URL.createObjectURL(res));
-    //       else setImagePreview(defaultImgUrl);
 
-    //       formik.setValues(res[1].data);
-    //       handleModalShow();
-    //     })
-    //   );
-    // }
-
-    if (e) e.preventDefault();
     if (ProDe_Id > 0) {
       console.log("load data");
-      ProductDetailService.getAvatarUrl(ProDe_Id).then((res) => {
-        console.log(res);
-        if (res.errorCode === 0) setImagePreview(res.data);
-        else setImagePreview(defaultImgUrl);
-      });
-      //load model data
-      ProductDetailService.get(ProDe_Id).then((res) => {
-        if (res.errorCode === 0) {
-          console.log(res);
-          formik.setValues(res.data);
+
+      const avatarReq = ProductDetailService.getAvatarUrl(ProDe_Id);
+      const productReq = ProductDetailService.get(ProDe_Id);
+
+      api.promise([avatarReq, productReq]).then(
+        api.spread((...res) => {
+          // console.log(res);
+
+          if (res[0].errorCode === 0) setImagePreview(res[0].data);
+          else setImagePreview(defaultImgUrl);
+
+          formik.setValues(res[1].data);
           handleModalShow();
-        }
-      });
+        })
+      );
     } else {
+      // console.log("add");
+      setImagePreview(defaultImgUrl);
       formik.resetForm();
       handleModalShow();
     }
+
+    // if (ProDe_Id > 0) {
+    //   ProductDetailService.getAvatarUrl(ProDe_Id).then((res) => {
+    //     console.log(res);
+    //     if (res.errorCode === 0) setImagePreview(res.data);
+    //     else setImagePreview(defaultImgUrl);
+    //   });
+
+    //   ProductDetailService.get(ProDe_Id).then((res) => {
+    //     if (res.errorCode === 0) {
+    //       console.log(res);
+    //       formik.setValues(res.data);
+    //       handleModalShow();
+    //     }
+    //   });
+    // } else {
+    //   formik.resetForm();
+    //   handleModalShow();
+    // }
   };
 
   const handleDelete = (e, ProDe_Id) => {

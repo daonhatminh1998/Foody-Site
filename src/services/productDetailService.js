@@ -1,3 +1,4 @@
+import axios from "axios";
 import api from "./api";
 const list = () => api.get(api.url.productDetail);
 
