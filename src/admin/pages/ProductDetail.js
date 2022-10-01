@@ -8,13 +8,12 @@ import { Button, Card, Col, Row, Table, Modal, Form } from "react-bootstrap";
 import Pagination from "react-bootstrap/Pagination";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 
-import api from "../../services/api";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 
-import ProductDetailService from "../../services/productDetailService";
+import api from "../../services/api";
 import ProductService from "../../services/ProductsService";
+import ProductDetailService from "../../services/productDetailService";
 
 import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";

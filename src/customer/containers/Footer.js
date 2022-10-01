@@ -17,10 +17,7 @@ import { Col, Container, Row } from "react-bootstrap";
 const Footer = () => {
   return (
     <>
-      <div
-        className="container-fluid bg-dark footer mt-5 pt-5 wow fadeIn"
-        data-wow-delay="0.1s"
-      >
+      <div className="container-fluid bg-dark footer pt-5">
         <Container className=" py-5">
           <Row className=" g-5">
             <Col lg={3} md={6}>

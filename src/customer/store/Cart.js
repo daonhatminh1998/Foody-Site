@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import productService from "../../services/productDetailService";
+import { Pagination } from "react-bootstrap";
+
+import ProductDetailService from "../../services/productDetailService";
+
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
 import useLocalStorage from "../hooks/useLocalStorage";
 
@@ -10,7 +13,12 @@ export const CartProvider = ({ children }) => {
   // authSlice = createSlice
 
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
-  const [products, setProducts] = useState([]);
+
+  const RECORDS_PER_PAGE = 6;
+  const [productDetail, setProductDetail] = useState([]);
+  const [page, setPage] = useState(0);
+  const [pageLength] = useState(RECORDS_PER_PAGE);
+  const [pagingItems, setPagingItems] = useState([]);
 
   const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
@@ -18,14 +26,83 @@ export const CartProvider = ({ children }) => {
   );
 
   const loadData = () => {
-    productService.list().then((res) => {
-      setProducts(res.data);
+    ProductDetailService.getPaging(page, pageLength).then((res) => {
+      setProductDetail(res.data);
+
+      const last = res.pagingInfo.totalPages - 1;
+      var left = page - 2,
+        right = page + 2 + 1,
+        range = [],
+        rangeWithDots = [];
+      let l;
+
+      for (let i = 0; i <= last; i++) {
+        if (i === 0 || i === last || (i >= left && i < right)) {
+          range.push(i);
+        }
+      }
+
+      // console.log(range);
+      //mũi tên
+      if (res.pagingInfo.totalPages > 0) {
+        rangeWithDots = [
+          <Pagination.First
+            key="frist"
+            disabled={page === 0}
+            onClick={() => setPage(0)}
+          />,
+          <Pagination.Prev
+            key="Previous"
+            disabled={page === 0}
+            onClick={() => setPage(res.pagingInfo.page - 1)}
+          />,
+        ];
+      }
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 4) {
+            rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
+          } else if (i - l !== 1) {
+            rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
+          }
+        }
+
+        rangeWithDots.push(
+          <Pagination.Item
+            key={i}
+            active={i === page}
+            onClick={() => setPage(i)}
+          >
+            {i + 1}
+          </Pagination.Item>
+        );
+        l = i;
+      }
+
+      //mũi tên cuối
+
+      rangeWithDots.push(
+        <Pagination.Next
+          key="Next"
+          disabled={page === res.pagingInfo.totalPages - 1}
+          onClick={() => setPage(res.pagingInfo.page + 1)}
+        />,
+        <Pagination.Last
+          key="last"
+          disabled={page === res.pagingInfo.totalPages - 1}
+          onClick={() => setPage(res.pagingInfo.totalPages - 1)}
+        />
+      );
+
+      setPagingItems(rangeWithDots);
     });
   };
 
   useEffect(() => {
     loadData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageLength]);
 
   // trạng thái giỏ hàng
   const [isOpen, setIsOpen] = useState(false);
@@ -80,7 +157,8 @@ export const CartProvider = ({ children }) => {
   return (
     <CartStateContext.Provider
       value={{
-        products,
+        pagingItems,
+        productDetail,
         getItemQuantity,
         increaseCartQuantity,
         decreaseCartQuantity,

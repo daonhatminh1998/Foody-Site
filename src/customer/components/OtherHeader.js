@@ -1,8 +1,9 @@
 import React from "react";
+import { Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const OtherHeader = (e) => {
-  const { label } = e;
+  const { label, id } = e;
   return (
     <>
       <div
@@ -17,8 +18,8 @@ const OtherHeader = (e) => {
         }}
         data-wow-delay="0.1s"
       >
-        <div className="container">
-          <h1 className="display-3 mb-3 animated slideInDown">{label}</h1>
+        <Container>
+          <h1 className="display-3 mb-3 animated slideInDown">{id}</h1>
           <nav aria-label="breadcrumb animated slideInDown">
             <ol className="breadcrumb mb-0">
               <li className="breadcrumb-item">
@@ -26,15 +27,32 @@ const OtherHeader = (e) => {
                   Home
                 </Link>
               </li>
-              <li
-                className="breadcrumb-item text-dark active"
-                aria-current="page"
-              >
-                {label}
-              </li>
+
+              {id ? (
+                <>
+                  <li className="breadcrumb-item">
+                    <Link className="text-body" to={`/${label}`}>
+                      {label}
+                    </Link>
+                  </li>
+                  <li
+                    className="breadcrumb-item text-dark active"
+                    aria-current="page"
+                  >
+                    {id}
+                  </li>
+                </>
+              ) : (
+                <li
+                  className="breadcrumb-item text-dark active"
+                  aria-current="page"
+                >
+                  {label}
+                </li>
+              )}
             </ol>
           </nav>
-        </div>
+        </Container>
       </div>
     </>
   );
