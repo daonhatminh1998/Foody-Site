@@ -385,7 +385,7 @@ const ProductDetail = () => {
     if (e) e.preventDefault();
     // console.log(ProductDetailService.getAvatar(ProDe_Id));
     // if (ProDe_Id > 0) {
-    //   const avatarReq = ProductDetailService.getAvatar(ProDe_Id);
+    //   const avatarReq = ProductDetailService.getAvatarUrl(ProDe_Id);
     //   const productReq = ProductDetailService.get(ProDe_Id);
     //   api.promise([avatarReq, productReq]).then(
     //     api.spread((...res) => {
@@ -399,21 +399,21 @@ const ProductDetail = () => {
     // }
 
     if (ProDe_Id > 0) {
-      // ProductDetailService.getAvatar(ProDe_Id).then((res) => {
-      //   if (res.size > 0) setImagePreview(URL.createObjectURL(res));
-      //   else setImagePreview(defaultImgUrl);
-      // });
+      ProductDetailService.getAvatarUrl(ProDe_Id).then((res) => {
+        if (res.size > 0) setImagePreview(URL.createObjectURL(res));
+        else setImagePreview(defaultImgUrl);
+      });
 
       ProductDetailService.get(ProDe_Id).then((res) => {
         if (res.errorCode === 0) {
-          // setImagePreview(URL.createObjectURL(res));
+          setImagePreview(URL.createObjectURL(res));
           formik.setValues(res.data);
           handleModalShow();
         }
       });
     } else {
       formik.resetForm();
-      // setImagePreview(defaultImgUrl);
+      setImagePreview(defaultImgUrl);
       handleModalShow();
     }
   };
@@ -516,31 +516,6 @@ const ProductDetail = () => {
                     />
                   </th>
                 ))}
-
-                {/* <th>
-                  Name
-                  <Button onClick={() => handleSortAsc("Pro_Name")}>1</Button>
-                  <Button onClick={() => handleSortDesc("Pro_Name")}>2</Button>
-                </th>
-                <th>
-                  Price
-                  <Button onClick={() => handleSortAsc("Pro_Price")}>1</Button>
-                  <Button onClick={() => handleSortDesc("Pro_Price")}>2</Button>
-                </th>
-                <th style={{ width: "100px" }}>Avatar</th>
-                <th>
-                  Unit
-                  <span type="button" onClick={() => handleSortAsc("Pro_Unit")}>
-                    <FontAwesomeIcon icon={faArrowDown} />
-                  </span>
-                  <span type="button" onClick={() => handleSortAsc("Pro_Unit")}>
-                    <FontAwesomeIcon icon={faArrowUp} />
-                  </span>
-                </th>
-
-                <th>Type</th>
-                <th>Short Description</th>
-                <th>Long Description</th> */}
 
                 <th style={{ width: "80px" }}></th>
               </tr>
