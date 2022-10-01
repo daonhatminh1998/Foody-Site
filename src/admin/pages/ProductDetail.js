@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 
 import { Button, Card, Col, Row, Table, Modal, Form } from "react-bootstrap";
+import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import Pagination from "react-bootstrap/Pagination";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 
@@ -334,6 +335,7 @@ const ProductDetail = () => {
       Pro_Avatar: undefined,
       Pro_Unit: "",
       Pro_Id: "",
+      is_Published: true,
     },
 
     validationSchema: Yup.object({
@@ -540,7 +542,12 @@ const ProductDetail = () => {
                   </td>
                   <td>{list.Pro_Unit}</td>
                   <td>{list.type.Pro_Type}</td>
-                  <td dangerouslySetInnerHTML={{ __html: list.shortDes }} />
+                  <td
+                    className="text-wrap"
+                    // dangerouslySetInnerHTML={{ __html: list.shortDes }}
+                  >
+                    <span dangerouslySetInnerHTML={{ __html: list.shortDes }} />
+                  </td>
                   <td dangerouslySetInnerHTML={{ __html: list.longDes }} />
                   <td>
                     <a
@@ -587,36 +594,130 @@ const ProductDetail = () => {
               <Col>
                 <Row className="row-cols-2">
                   <Col>
-                    <Input
-                      label="Name"
-                      labelSize={2}
-                      maxLength="50"
-                      required
-                      formField={formik.getFieldProps("Pro_Name")}
-                      isValid={
-                        formik.touched.Pro_Name && !formik.errors.Pro_Name
-                      }
-                      errMessage={
-                        formik.touched.Pro_Name && formik.errors.Pro_Name
-                      }
-                    />
+                    <Row className="row-cols-1">
+                      <Col>
+                        <Input
+                          label="Name"
+                          labelSize={2}
+                          maxLength="50"
+                          required
+                          formField={formik.getFieldProps("Pro_Name")}
+                          isValid={
+                            formik.touched.Pro_Name && !formik.errors.Pro_Name
+                          }
+                          errMessage={
+                            formik.touched.Pro_Name && formik.errors.Pro_Name
+                          }
+                        />
+                      </Col>
+                      <Col>
+                        <Input
+                          label="Price"
+                          labelSize={2}
+                          maxLength="50"
+                          required
+                          formField={formik.getFieldProps("Pro_Price")}
+                          isValid={
+                            formik.touched.Pro_Price && !formik.errors.Pro_Price
+                          }
+                          errMessage={
+                            formik.touched.Pro_Price && formik.errors.Pro_Price
+                          }
+                        />
+                      </Col>
+
+                      <Col>
+                        <Input
+                          label="Unit"
+                          labelSize={2}
+                          maxLength="50"
+                          required
+                          formField={formik.getFieldProps("Pro_Unit")}
+                          isValid={
+                            formik.touched.Pro_Unit && !formik.errors.Pro_Unit
+                          }
+                          errMessage={
+                            formik.touched.Pro_Unit && formik.errors.Pro_Unit
+                          }
+                        />
+                      </Col>
+
+                      <Col>
+                        <Form.Group as={Row} className="mb-3">
+                          <Col className="align-self-center" sm="2">
+                            <Form.Label>Type</Form.Label>
+                          </Col>
+                          <Col>
+                            <Form.Select
+                              className="bg-white"
+                              {...formik.getFieldProps("Pro_Id")}
+                              isValid={
+                                formik.touched.Pro_Id && !formik.errors.Pro_Id
+                              }
+                              isInvalid={
+                                formik.touched.Pro_Id && formik.errors.Pro_Id
+                              }
+                            >
+                              <option value="">Select</option>
+                              {productType.map((list) => (
+                                <option key={list.Pro_Id} value={list.Pro_Id}>
+                                  {list.Pro_Type}
+                                </option>
+                              ))}
+                            </Form.Select>
+                            <Form.Control.Feedback type="invalid">
+                              {formik.touched.Pro_Id && formik.errors.Pro_Id}
+                            </Form.Control.Feedback>
+                          </Col>
+                        </Form.Group>
+                      </Col>
+
+                      <Col>
+                        <Form.Group as={Row} className="mb-3">
+                          <Col className="align-self-center" sm="2">
+                            <Form.Label>Publish</Form.Label>
+                          </Col>
+
+                          <Col className="text-center">
+                            <BootstrapSwitchButton
+                              checked={
+                                formik.values.is_Published ||
+                                formik.values.is_Published === 1
+                                  ? true
+                                  : false
+                              }
+                              width={200}
+                              offstyle="danger"
+                              onlabel="On"
+                              offlabel="Off"
+                              onChange={(checked) => {
+                                formik.setFieldValue("is_Published", checked);
+                              }}
+                            />
+                            {/* {console.log(formik.values.is_Published)} */}
+                          </Col>
+                        </Form.Group>
+                      </Col>
+                    </Row>
                   </Col>
 
-                  <Row>
-                    <input
-                      accept="image/*"
-                      type="file"
-                      name="image"
-                      ref={inputFileRef}
-                      className="d-none"
-                      onChange={handleChangeImage}
-                    />
-
-                    <Col md={3} className="align-self-center">
+                  <Row className="row-cols-1 justify-content-center">
+                    <Col md={8} lg={5}>
                       <img src={imagePreview} alt="" className="img-fluid" />
                     </Col>
 
-                    <Col>
+                    <Col md={8}>
+                      <input
+                        accept="image/*"
+                        type="file"
+                        name="image"
+                        ref={inputFileRef}
+                        className="d-none"
+                        onChange={handleChangeImage}
+                      />
+                    </Col>
+
+                    <Col className="text-center">
                       <Button
                         className="mt-3"
                         variant="primary"
@@ -627,128 +728,53 @@ const ProductDetail = () => {
                       </Button>
                     </Col>
                   </Row>
-
-                  <Col>
-                    <Input
-                      label="Price"
-                      labelSize={2}
-                      maxLength="50"
-                      required
-                      formField={formik.getFieldProps("Pro_Price")}
-                      isValid={
-                        formik.touched.Pro_Price && !formik.errors.Pro_Price
-                      }
-                      errMessage={
-                        formik.touched.Pro_Price && formik.errors.Pro_Price
-                      }
-                    />
-                  </Col>
-
-                  <Col>
-                    <Input
-                      label="Unit"
-                      labelSize={2}
-                      maxLength="50"
-                      required
-                      formField={formik.getFieldProps("Pro_Unit")}
-                      isValid={
-                        formik.touched.Pro_Unit && !formik.errors.Pro_Unit
-                      }
-                      errMessage={
-                        formik.touched.Pro_Unit && formik.errors.Pro_Unit
-                      }
-                    />
-                  </Col>
-
-                  <Col>
-                    <Form.Group as={Row} className="mb-3">
-                      <Form.Label as={Col} sm="2">
-                        Type
-                      </Form.Label>
-                      <Col>
-                        <Form.Select
-                          className="bg-white"
-                          {...formik.getFieldProps("Pro_Id")}
-                          isValid={
-                            formik.touched.Pro_Id && !formik.errors.Pro_Id
-                          }
-                          isInvalid={
-                            formik.touched.Pro_Id && formik.errors.Pro_Id
-                          }
-                        >
-                          <option value="">Select</option>
-                          {productType.map((list) => (
-                            <option key={list.Pro_Id} value={list.Pro_Id}>
-                              {list.Pro_Type}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <Form.Control.Feedback type="invalid">
-                          {formik.touched.Pro_Id && formik.errors.Pro_Id}
-                        </Form.Control.Feedback>
-                      </Col>
-                    </Form.Group>
-                  </Col>
-
-                  <Col>
-                    <Input
-                      label="Status"
-                      labelSize={2}
-                      maxLength="50"
-                      required
-                      formField={formik.getFieldProps("Pro_Unit")}
-                      isValid={
-                        formik.touched.Pro_Unit && !formik.errors.Pro_Unit
-                      }
-                      errMessage={
-                        formik.touched.Pro_Unit && formik.errors.Pro_Unit
-                      }
-                    />
-                  </Col>
                 </Row>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Short Description</Form.Label>
-                  <CKEditor
-                    editor={FullEditor}
-                    data={formik.values.shortDes}
-                    // onReady={(editor) => {
-
-                    //   console.log("Editor is ready to use!", editor);
-                    // }}
-                    // onChange={(event, editor) => {
-                    //   const data = editor.getData();
-                    //   console.log({ event, editor, data });
-                    // }}
-                    onBlur={(event, editor) => {
-                      formik.setFieldValue("shortDes", editor.getData());
-                    }}
-                    // onFocus={(event, editor) => {
-                    //   console.log("Focus.", editor);
-                    // }}
-                  />
-                </Form.Group>
               </Col>
             </Row>
 
-            <CKEditor
-              editor={FullEditor}
-              data={formik.values.longDes}
-              // onReady={(editor) => {
+            <Form.Group className="mb-3">
+              <Form.Label>Short Description</Form.Label>
+              <CKEditor
+                editor={FullEditor}
+                data={formik.values.shortDes}
+                // onReady={(editor) => {
 
-              //   console.log("Editor is ready to use!", editor);
-              // }}
-              // onChange={(event, editor) => {
-              //   const data = editor.getData();
-              //   console.log({ event, editor, data });
-              // }}
-              onBlur={(event, editor) => {
-                formik.setFieldValue("longDes", editor.getData());
-              }}
-              // onFocus={(event, editor) => {
-              //   console.log("Focus.", editor);
-              // }}
-            />
+                //   console.log("Editor is ready to use!", editor);
+                // }}
+                // onChange={(event, editor) => {
+                //   const data = editor.getData();
+                //   console.log({ event, editor, data });
+                // }}
+                onBlur={(event, editor) => {
+                  formik.setFieldValue("shortDes", editor.getData());
+                }}
+                // onFocus={(event, editor) => {
+                //   console.log("Focus.", editor);
+                // }}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Long Description</Form.Label>
+              <CKEditor
+                editor={FullEditor}
+                data={formik.values.longDes}
+                // onReady={(editor) => {
+
+                //   console.log("Editor is ready to use!", editor);
+                // }}
+                // onChange={(event, editor) => {
+                //   const data = editor.getData();
+                //   console.log({ event, editor, data });
+                // }}
+                onBlur={(event, editor) => {
+                  formik.setFieldValue("longDes", editor.getData());
+                }}
+                // onFocus={(event, editor) => {
+                //   console.log("Focus.", editor);
+                // }}
+              />
+            </Form.Group>
           </Form>
         </Modal.Body>
 

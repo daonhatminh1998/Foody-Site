@@ -17,6 +17,7 @@
     "boostrap": "^2.0.0",
     "bootstrap": "^5.2.0",
     "bootstrap-icons": "^1.9.1",
+    "bootstrap-switch-button-react": "^1.2.0",
     "ckeditor5-build-full": "^25.0.0",
     "font-awesome": "^4.7.0",
     "formik": "^2.2.9",

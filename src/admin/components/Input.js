@@ -14,15 +14,16 @@ class Input extends React.Component {
       ...others
     } = this.props;
 
-    const labelClass = `col-sm-${labelSize ? labelSize : 3} ${
-      required ? "required" : ""
-    }`;
+    const labelClass = ` ${required ? "required" : ""}`;
 
     return (
       <Form.Group as={Row} className="mb-3">
-        <Form.Label htmlFor={id} className={labelClass}>
-          {label}
-        </Form.Label>
+        <Col sm={labelSize ? labelSize : 3} className="align-self-center">
+          <Form.Label htmlFor={id} className={labelClass}>
+            {label}
+          </Form.Label>
+        </Col>
+
         <Col>
           {others["rows"] > 1 ? (
             <Form.Control
