@@ -16,7 +16,7 @@ const routes = [
   { path: "/ContactUs", component: <ContactUs /> },
   { path: "/CustomerReview", component: <CustomerReview /> },
   { path: "/OurFeatures", component: <OurFeatures /> },
-  { path: "/Products", component: <OurProducts /> },
+  { path: "/OurProducts", component: <OurProducts /> },
   { path: "/PageNotFound", component: <PageNotFound /> },
   { path: "/Product/:id", component: <DetailPages /> },
   { path: "/*", component: <PageNotFound /> },

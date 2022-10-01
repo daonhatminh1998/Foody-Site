@@ -20,7 +20,7 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, productDetail, clearCart } = useCart();
+  const { closeCart, cartItems, products, clearCart } = useCart();
 
   const [modalShow, setShowModal] = useState(false);
   const handleModalClose = () => setShowModal(false);
@@ -114,7 +114,7 @@ export function ShoppingCart({ isOpen }) {
               <span className="w-auto">
                 {formatCurrency(
                   cartItems.reduce((total, cartItem) => {
-                    const item = productDetail.find(
+                    const item = products.find(
                       (i) => i.ProDe_Id === cartItem.id
                     );
                     return total + (item?.Pro_Price || 0) * cartItem.quantity;

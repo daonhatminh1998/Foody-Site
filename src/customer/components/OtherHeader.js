@@ -1,7 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const OtherHeader = ({ label, id }) => {
+const OtherHeader = (e) => {
+  const { label } = e;
   return (
     <>
       <div
@@ -14,6 +15,7 @@ const OtherHeader = ({ label, id }) => {
           backgroundPosition: "top rignt",
           backgroundSize: "cover",
         }}
+        data-wow-delay="0.1s"
       >
         <div className="container">
           <h1 className="display-3 mb-3 animated slideInDown">{label}</h1>
@@ -24,18 +26,12 @@ const OtherHeader = ({ label, id }) => {
                   Home
                 </Link>
               </li>
-              {id ? (
-                <>
-                  <li className="breadcrumb-item">
-                    <Link className="text-body" to={`/${label}`}>
-                      {label}
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item">{id}</li>
-                </>
-              ) : (
-                <li className="breadcrumb-item">{label}</li>
-              )}
+              <li
+                className="breadcrumb-item text-dark active"
+                aria-current="page"
+              >
+                {label}
+              </li>
             </ol>
           </nav>
         </div>

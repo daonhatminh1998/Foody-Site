@@ -65,8 +65,6 @@ const api = {
   put: instance.put,
   delete: instance.delete,
   patch: instance.patch,
-  promise: axios.all,
-  spread: axios.spread,
 };
 
 export default api;

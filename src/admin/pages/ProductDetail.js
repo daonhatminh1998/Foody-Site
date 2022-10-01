@@ -332,7 +332,7 @@ const ProductDetail = () => {
       Des_Id: 0,
       Pro_Name: "",
       Pro_Price: 0,
-      img: undefined,
+      Pro_Avatar: undefined,
       Pro_Unit: "",
       Pro_Id: "",
     },
@@ -349,7 +349,6 @@ const ProductDetail = () => {
     }),
 
     onSubmit: (values) => {
-      console.log(values);
       handleFormSubmit(values);
       // handleImageUpload();
     },
@@ -398,22 +397,24 @@ const ProductDetail = () => {
     //   );
     // }
 
+    if (e) e.preventDefault();
     if (ProDe_Id > 0) {
+      console.log("load data");
       ProductDetailService.getAvatarUrl(ProDe_Id).then((res) => {
-        if (res.size > 0) setImagePreview(URL.createObjectURL(res));
+        console.log(res);
+        if (res.errorCode === 0) setImagePreview(res.data);
         else setImagePreview(defaultImgUrl);
       });
-
+      //load model data
       ProductDetailService.get(ProDe_Id).then((res) => {
         if (res.errorCode === 0) {
-          setImagePreview(URL.createObjectURL(res));
+          console.log(res);
           formik.setValues(res.data);
           handleModalShow();
         }
       });
     } else {
       formik.resetForm();
-      setImagePreview(defaultImgUrl);
       handleModalShow();
     }
   };
@@ -714,7 +715,6 @@ const ProductDetail = () => {
                     //   console.log({ event, editor, data });
                     // }}
                     onBlur={(event, editor) => {
-                      console.log("Blur.", editor.getData());
                       formik.setFieldValue("shortDes", editor.getData());
                     }}
                     // onFocus={(event, editor) => {
@@ -737,7 +737,6 @@ const ProductDetail = () => {
               //   console.log({ event, editor, data });
               // }}
               onBlur={(event, editor) => {
-                console.log("Blur.", editor);
                 formik.setFieldValue("longDes", editor.getData());
               }}
               // onFocus={(event, editor) => {

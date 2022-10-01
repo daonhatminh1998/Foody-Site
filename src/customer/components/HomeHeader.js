@@ -32,7 +32,7 @@ const HomeHeader = () => {
                       <Row sm={"auto"}>
                         <Col>
                           <Link
-                            to="/Products"
+                            to="/OurProducts"
                             className="btn btn-primary rounded-pill py-sm-3 px-sm-5"
                           >
                             Products

@@ -15,7 +15,6 @@ const adminRoutes = [
   { path: "/orders", component: <Orders /> },
   { path: "/orderDetail", component: <OrderDetail /> },
   { path: "/*", component: <NotFound /> },
-  { path: "/network-error", component: <NotFound /> },
 ];
 
 export default adminRoutes;
