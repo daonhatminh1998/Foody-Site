@@ -542,12 +542,7 @@ const ProductDetail = () => {
                   </td>
                   <td>{list.Pro_Unit}</td>
                   <td>{list.type.Pro_Type}</td>
-                  <td
-                    className="text-wrap"
-                    // dangerouslySetInnerHTML={{ __html: list.shortDes }}
-                  >
-                    <span dangerouslySetInnerHTML={{ __html: list.shortDes }} />
-                  </td>
+                  <td dangerouslySetInnerHTML={{ __html: list.shortDes }}></td>
                   <td dangerouslySetInnerHTML={{ __html: list.longDes }} />
                   <td>
                     <a
