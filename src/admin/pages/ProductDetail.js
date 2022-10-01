@@ -1,19 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
+
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import {
-  Button,
-  Card,
-  Col,
-  Container,
-  Row,
-  Table,
-  Modal,
-  Form,
-} from "react-bootstrap";
+
+import { Button, Card, Col, Row, Table, Modal, Form } from "react-bootstrap";
 import Pagination from "react-bootstrap/Pagination";
 import CardHeader from "react-bootstrap/esm/CardHeader";
+
+import api from "../../services/api";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 import ProductDetailService from "../../services/productDetailService";
 import ProductService from "../../services/ProductsService";
@@ -24,19 +22,49 @@ import Input from "../components/Input";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import FullEditor from "ckeditor5-build-full";
 
-const ProductDetail = () => {
-  // console.log(ProductDetailService.getPaging(["r"]));
+import { DebounceInput } from "react-debounce-input";
 
-  // const [selectedImage, setSelectedImage] = useState(null);
+const ProductDetail = () => {
+  const tableHeader = [
+    {
+      name: "Name",
+      sort: "Pro_Name",
+    },
+    {
+      name: "Price",
+      sort: "Pro_Price",
+    },
+    {
+      name: "Avatar",
+      sort: "Pro_Avatar",
+    },
+    {
+      name: "Unit",
+      sort: "Pro_Unit",
+    },
+    {
+      name: "Type",
+      sort: "Pro_Id",
+    },
+    {
+      name: "Short Description",
+      sort: "shortDes",
+    },
+    {
+      name: "Long Description",
+      sort: "longDes",
+    },
+  ];
+
   const [productDetail, setProductDetail] = useState([]);
   const [productType, setProductType] = useState([]);
 
   const [page, setPage] = useState(0);
   const [pageLength, setPageLength] = useState(5);
-  const [sort, setSort] = useState();
+  const [sort, setSort] = useState("");
   const [priceTo, setPriceTo] = useState();
   const [priceFrom, setPriceFrom] = useState();
-  const [search, setSearch] = useState(0);
+  const [search, setSearch] = useState("");
   const [pagingItems, setPagingItems] = useState([]);
 
   const loadData = () => {
@@ -63,21 +91,21 @@ const ProductDetail = () => {
         }
       }
 
-      console.log(range);
+      // console.log(range);
       //mũi tên
-      if (res.pagingInfo.page > 0) {
-        rangeWithDots.push(
-          <Pagination.First key="frist" onClick={() => setPage(0)} />
-        );
-        rangeWithDots.push(
+      if (res.pagingInfo.totalPages > 0) {
+        rangeWithDots = [
+          <Pagination.First
+            key="frist"
+            disabled={page === 0}
+            onClick={() => setPage(0)}
+          />,
           <Pagination.Prev
             key="Previous"
+            disabled={page === 0}
             onClick={() => setPage(res.pagingInfo.page - 1)}
-          />
-        );
-      } else {
-        rangeWithDots.push(<Pagination.First key="frist" disabled />);
-        rangeWithDots.push(<Pagination.Prev key="Previous" disabled />);
+          />,
+        ];
       }
 
       for (let i of range) {
@@ -105,23 +133,19 @@ const ProductDetail = () => {
       }
 
       //mũi tên cuối
-      if (res.pagingInfo.page !== res.pagingInfo.totalPages - 1) {
-        rangeWithDots.push(
-          <Pagination.Next
-            key="Next"
-            onClick={() => setPage(res.pagingInfo.page + 1)}
-          />
-        );
-        rangeWithDots.push(
-          <Pagination.Last
-            key="last"
-            onClick={() => setPage(res.pagingInfo.totalPages - 1)}
-          />
-        );
-      } else {
-        rangeWithDots.push(<Pagination.Next key="Next" disabled />);
-        rangeWithDots.push(<Pagination.Last key="last" disabled />);
-      }
+
+      rangeWithDots.push(
+        <Pagination.Next
+          key="Next"
+          disabled={page === res.pagingInfo.totalPages - 1}
+          onClick={() => setPage(res.pagingInfo.page + 1)}
+        />,
+        <Pagination.Last
+          key="last"
+          disabled={page === res.pagingInfo.totalPages - 1}
+          onClick={() => setPage(res.pagingInfo.totalPages - 1)}
+        />
+      );
 
       // for (let i = 1, l = 20; i <= l; i++) {
       //   rangeWithDots.push(
@@ -263,11 +287,26 @@ const ProductDetail = () => {
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageLength]);
+  }, [page, pageLength, search, sort]);
 
   const handleChangePageLength = (e) => {
     setPage(0);
     setPageLength(e.target.value);
+  };
+
+  const handleSearch = (e) => {
+    setPage(0);
+    setSearch(e.target.value);
+  };
+
+  const handleSortAsc = (targets) => {
+    setPage(0);
+    setSort(`${targets},asc`);
+  };
+
+  const handleSortDesc = (targets) => {
+    setPage(0);
+    setSort(`${targets},desc`);
   };
 
   //Modal
@@ -276,7 +315,8 @@ const ProductDetail = () => {
   const handleModalShow = () => setShowModal(true);
 
   const inputFileRef = useRef();
-  const defaultImgUrl = "http://localhost/foody/api/productDetail/get_image/1";
+  const defaultImgUrl =
+    "http://myfoody290798.herokuapp.com/public/data/products/product-0.jpg";
   const [imagePreview, setImagePreview] = useState(defaultImgUrl);
 
   const handleChangeImage = (e) => {
@@ -293,7 +333,6 @@ const ProductDetail = () => {
       Pro_Name: "",
       Pro_Price: 0,
       img: undefined,
-      Pro_Description: "Good products",
       Pro_Unit: "",
       Pro_Id: "",
     },
@@ -344,20 +383,37 @@ const ProductDetail = () => {
 
   const showEditModal = (e, ProDe_Id) => {
     if (e) e.preventDefault();
+    // console.log(ProductDetailService.getAvatar(ProDe_Id));
+    // if (ProDe_Id > 0) {
+    //   const avatarReq = ProductDetailService.getAvatar(ProDe_Id);
+    //   const productReq = ProductDetailService.get(ProDe_Id);
+    //   api.promise([avatarReq, productReq]).then(
+    //     api.spread((...res) => {
+    //       if (res[0].size > 0) setImagePreview(URL.createObjectURL(res));
+    //       else setImagePreview(defaultImgUrl);
+
+    //       formik.setValues(res[1].data);
+    //       handleModalShow();
+    //     })
+    //   );
+    // }
+
     if (ProDe_Id > 0) {
-      ProductDetailService.getAvatar(ProDe_Id).then((res) => {
-        // console.log(res.size);
-        if (res.size > 0) setImagePreview(URL.createObjectURL(res));
-        else setImagePreview(defaultImgUrl);
-      });
+      // ProductDetailService.getAvatar(ProDe_Id).then((res) => {
+      //   if (res.size > 0) setImagePreview(URL.createObjectURL(res));
+      //   else setImagePreview(defaultImgUrl);
+      // });
+
       ProductDetailService.get(ProDe_Id).then((res) => {
         if (res.errorCode === 0) {
+          // setImagePreview(URL.createObjectURL(res));
           formik.setValues(res.data);
           handleModalShow();
         }
       });
     } else {
       formik.resetForm();
+      // setImagePreview(defaultImgUrl);
       handleModalShow();
     }
   };
@@ -375,8 +431,8 @@ const ProductDetail = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <Card className="border-primary bt-5">
+    <>
+      <Card className="border-primary bt-5 mt-4">
         <CardHeader>
           <Row>
             <Col>
@@ -401,7 +457,7 @@ const ProductDetail = () => {
         <Card.Body>
           <Row className="pb-2">
             <Col>
-              <Form.Group as={Row} className="gx-1">
+              <Row className="gx-1">
                 <Form.Label as={Col} sm="auto">
                   Show
                 </Form.Label>
@@ -422,10 +478,17 @@ const ProductDetail = () => {
                 <Form.Label as={Col} sm="auto">
                   entries
                 </Form.Label>
-              </Form.Group>
+              </Row>
             </Col>
             <Col xs="auto">
-              <Input type="search"></Input>
+              <DebounceInput
+                value={search}
+                minLength={2}
+                placeholder="search"
+                debounceTimeout={300}
+                label="Search"
+                onChange={handleSearch}
+              />
             </Col>
           </Row>
 
@@ -433,14 +496,51 @@ const ProductDetail = () => {
             <thead>
               <tr className="table-primary border-primary ">
                 <th style={{ width: "50px" }}>#</th>
-                <th>Name</th>
-                <th>Price</th>
+                {tableHeader.map((e) => (
+                  <th style={{ width: "30px" }} key={e.name}>
+                    {e.name}
+                    <FontAwesomeIcon
+                      className="text-muted"
+                      onClick={() => handleSortAsc(e.sort)}
+                      type="button"
+                      size="xs"
+                      icon={faArrowDown}
+                    />
+
+                    <FontAwesomeIcon
+                      type="button"
+                      className="text-muted"
+                      onClick={() => handleSortDesc(e.sort)}
+                      size="xs"
+                      icon={faArrowUp}
+                    />
+                  </th>
+                ))}
+
+                {/* <th>
+                  Name
+                  <Button onClick={() => handleSortAsc("Pro_Name")}>1</Button>
+                  <Button onClick={() => handleSortDesc("Pro_Name")}>2</Button>
+                </th>
+                <th>
+                  Price
+                  <Button onClick={() => handleSortAsc("Pro_Price")}>1</Button>
+                  <Button onClick={() => handleSortDesc("Pro_Price")}>2</Button>
+                </th>
                 <th style={{ width: "100px" }}>Avatar</th>
-                <th>Unit</th>
+                <th>
+                  Unit
+                  <span type="button" onClick={() => handleSortAsc("Pro_Unit")}>
+                    <FontAwesomeIcon icon={faArrowDown} />
+                  </span>
+                  <span type="button" onClick={() => handleSortAsc("Pro_Unit")}>
+                    <FontAwesomeIcon icon={faArrowUp} />
+                  </span>
+                </th>
 
                 <th>Type</th>
                 <th>Short Description</th>
-                <th>Long Description</th>
+                <th>Long Description</th> */}
 
                 <th style={{ width: "80px" }}></th>
               </tr>
@@ -528,16 +628,12 @@ const ProductDetail = () => {
                       ref={inputFileRef}
                       className="d-none"
                       onChange={handleChangeImage}
-                      // onChange={(e) => {
-                      //   // console.log(e.target.files[0]);
-                      //   setSelectedImage(e.target.files[0]);
-                      //   formik.setFieldValue("img", e.currentTarget.files[0]);
-                      //   console.log("selected image", selectedImage);
-                      // }}
                     />
+
                     <Col md={3} className="align-self-center">
                       <img src={imagePreview} alt="" className="img-fluid" />
                     </Col>
+
                     <Col>
                       <Button
                         className="mt-3"
@@ -548,26 +644,6 @@ const ProductDetail = () => {
                         Choose Image
                       </Button>
                     </Col>
-                    {/* {selectedImage ? (
-                      <Col md={3} className="align-self-center">
-                        <img
-                          src={URL.createObjectURL(selectedImage)}
-                          alt=""
-                          className="img-fluid"
-                        />
-                      </Col>
-                    ) : (
-                      ""
-                    )} */}
-                    {/* <Col md={3} className="align-self-center">
-                      <img
-                        src={
-                          process.env.PUBLIC_URL + `${formik.values.Pro_Avatar}`
-                        }
-                        alt=""
-                        className="img-fluid"
-                      />
-                    </Col> */}
                   </Row>
 
                   <Col>
@@ -709,7 +785,7 @@ const ProductDetail = () => {
           </CustomButton>
         </Modal.Footer>
       </Modal>
-    </Container>
+    </>
   );
 };
 

@@ -2,7 +2,6 @@ import React from "react";
 
 import AdminNavBar from "./AdminNavbar";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Container } from "react-bootstrap";
 
 import adminRoutes from "../routes";
 import { useSelector } from "react-redux";
@@ -15,13 +14,11 @@ const AdminLayout = () => {
       {isLoggedIn ? (
         <>
           <AdminNavBar />
-          <Container>
-            <Routes>
-              {adminRoutes.map((route, idx) => (
-                <Route key={idx} path={route.path} element={route.component} />
-              ))}
-            </Routes>
-          </Container>
+          <Routes>
+            {adminRoutes.map((route, idx) => (
+              <Route key={idx} path={route.path} element={route.component} />
+            ))}
+          </Routes>
         </>
       ) : (
         <Navigate to={path} />

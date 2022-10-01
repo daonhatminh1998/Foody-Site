@@ -3,7 +3,8 @@ import store from "../store";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
-  baseUrl: "http://localhost/foody/api/",
+  // baseUrl: "http://localhost/foody/api/",
+  baseUrl: "https://myfoody290798.herokuapp.com/api/",
   login: "/login",
   products: "/products",
   productDetail: "/productDetail",
@@ -64,6 +65,8 @@ const api = {
   put: instance.put,
   delete: instance.delete,
   patch: instance.patch,
+  promise: axios.all,
+  spread: axios.spread,
 };
 
 export default api;

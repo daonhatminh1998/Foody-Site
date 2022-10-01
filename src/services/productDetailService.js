@@ -39,6 +39,7 @@ const update = (id, data) => {
     },
   });
 };
+const remove = (id) => api.delete(`${api.url.productDetail}/${id}`);
 // get img with full path
 const getAvatarUrl = (id) =>
   api.get(`${api.url.productDetail}/get_image_url/${id}`);
@@ -50,8 +51,6 @@ const getAvatar = (id) =>
   api.get(`${api.url.productDetail}/get_image/${id}`, {
     responseType: "blob",
   });
-
-const remove = (id) => api.delete(`${api.url.productDetail}/${id}`);
 
 const ProductDetailService = {
   list,

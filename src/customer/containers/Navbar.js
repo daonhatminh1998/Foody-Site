@@ -62,7 +62,7 @@ const Navbars = () => {
               </Nav.Link>
             </Col>
             <Col xs="12" xl="auto" onClick={scrollOnTop}>
-              <Nav.Link as={NavLink} to="/OurProducts">
+              <Nav.Link as={NavLink} to="/Products">
                 Products
               </Nav.Link>
             </Col>
