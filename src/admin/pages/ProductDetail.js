@@ -47,12 +47,7 @@ const ProductDetail = () => {
       sort: "Pro_Id",
     },
     {
-      name: "Short Description",
-      sort: "shortDes",
-    },
-    {
-      name: "Long Description",
-      sort: "longDes",
+      name: "Description",
     },
     {
       name: "Activate",
@@ -315,10 +310,15 @@ const ProductDetail = () => {
     setSort(`${targets},desc`);
   };
 
-  //Modal
+  //Modal Edit
   const [modalShow, setShowModal] = useState(false);
   const handleModalClose = () => setShowModal(false);
   const handleModalShow = () => setShowModal(true);
+
+  //Modal Description
+  const [modalDescriptionShow, setShowDescriptionModal] = useState(false);
+  const handleDescriptionModalClose = () => setShowDescriptionModal(false);
+  const handleDescriptionModalShow = () => setShowDescriptionModal(true);
 
   const inputFileRef = useRef();
   const defaultImgUrl =
@@ -378,6 +378,7 @@ const ProductDetail = () => {
           toast.success("Update Successful");
           loadData();
           handleModalClose();
+          handleDescriptionModalClose();
         } else {
           // toast.error("Update Failed");
           toast.error(res.message);
@@ -391,14 +392,12 @@ const ProductDetail = () => {
 
     if (ProDe_Id > 0) {
       console.log("load data");
-
       const avatarReq = ProductDetailService.getAvatarUrl(ProDe_Id);
       const productReq = ProductDetailService.get(ProDe_Id);
 
       api.promise([avatarReq, productReq]).then(
         api.spread((...res) => {
           // console.log(res);
-
           if (res[0].errorCode === 0) setImagePreview(res[0].data);
           else setImagePreview(defaultImgUrl);
 
@@ -411,6 +410,40 @@ const ProductDetail = () => {
       setImagePreview(defaultImgUrl);
       formik.resetForm();
       handleModalShow();
+    }
+
+    // if (ProDe_Id > 0) {
+    //   ProductDetailService.getAvatarUrl(ProDe_Id).then((res) => {
+    //     console.log(res);
+    //     if (res.errorCode === 0) setImagePreview(res.data);
+    //     else setImagePreview(defaultImgUrl);
+    //   });
+
+    //   ProductDetailService.get(ProDe_Id).then((res) => {
+    //     if (res.errorCode === 0) {
+    //       console.log(res);
+    //       formik.setValues(res.data);
+    //       handleModalShow();
+    //     }
+    //   });
+    // } else {
+    //   formik.resetForm();
+    //   handleModalShow();
+    // }
+  };
+
+  const showDescriptionModal = (e, ProDe_Id) => {
+    if (e) e.preventDefault();
+
+    if (ProDe_Id > 0) {
+      console.log("load data");
+      ProductDetailService.get(ProDe_Id).then((res) => {
+        if (res.errorCode === 0) {
+          // console.log(res);
+          formik.setValues(res.data);
+          handleDescriptionModalShow();
+        }
+      });
     }
 
     // if (ProDe_Id > 0) {
@@ -469,6 +502,7 @@ const ProductDetail = () => {
             </Col>
           </Row>
         </CardHeader>
+
         <Card.Body>
           <Row className="pb-2">
             <Col>
@@ -514,27 +548,34 @@ const ProductDetail = () => {
                 {tableHeader.map((e) => (
                   <th style={{ width: "30px" }} key={e.name}>
                     {e.name}
-                    <FontAwesomeIcon
-                      className="text-muted"
-                      onClick={() => handleSortAsc(e.sort)}
-                      type="button"
-                      size="xs"
-                      icon={faArrowDown}
-                    />
+                    {e.sort ? (
+                      <>
+                        <FontAwesomeIcon
+                          className="text-muted"
+                          onClick={() => handleSortAsc(e.sort)}
+                          type="button"
+                          size="xs"
+                          icon={faArrowDown}
+                        />
 
-                    <FontAwesomeIcon
-                      type="button"
-                      className="text-muted"
-                      onClick={() => handleSortDesc(e.sort)}
-                      size="xs"
-                      icon={faArrowUp}
-                    />
+                        <FontAwesomeIcon
+                          type="button"
+                          className="text-muted"
+                          onClick={() => handleSortDesc(e.sort)}
+                          size="xs"
+                          icon={faArrowUp}
+                        />
+                      </>
+                    ) : (
+                      ""
+                    )}
                   </th>
                 ))}
 
                 <th style={{ width: "80px" }}></th>
               </tr>
             </thead>
+
             <tbody>
               {productDetail.map((list, idx) => (
                 <tr key={list.ProDe_Id}>
@@ -548,13 +589,22 @@ const ProductDetail = () => {
                   </td>
                   <td>{list.Pro_Unit}</td>
                   <td>{list.type.Pro_Type}</td>
-                  <td dangerouslySetInnerHTML={{ __html: list.shortDes }}></td>
-                  <td dangerouslySetInnerHTML={{ __html: list.longDes }} />
+                  <td>
+                    <a
+                      href="/#"
+                      //show item in list
+                      onClick={(e) => showDescriptionModal(e, list.ProDe_Id)}
+                    >
+                      <i className="bi bi-eye-fill text-dark fs-3"></i>
+                    </a>
+                  </td>
+                  {/* <td dangerouslySetInnerHTML={{ __html: list.shortDes }}/>
+                  <td dangerouslySetInnerHTML={{ __html: list.longDes }} /> */}
                   <td>
                     {list.is_Published === 1 ? (
-                      <i class="bi bi-check text-primary fs-3"></i>
+                      <i className="bi bi-check text-primary fs-3"></i>
                     ) : (
-                      <i class="bi bi-x text-danger fs-3"></i>
+                      <i className="bi bi-x text-danger fs-3"></i>
                     )}
                   </td>
                   <td>
@@ -583,6 +633,79 @@ const ProductDetail = () => {
         </Card.Body>
       </Card>
 
+      {/* Description */}
+      <Modal
+        show={modalDescriptionShow}
+        onHide={handleDescriptionModalClose}
+        dialogClassName="modal-90w"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Description</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Short Description</Form.Label>
+              <CKEditor
+                editor={FullEditor}
+                data={formik.values.shortDes}
+                // onReady={(editor) => {
+
+                //   console.log("Editor is ready to use!", editor);
+                // }}
+                // onChange={(event, editor) => {
+                //   const data = editor.getData();
+                //   console.log({ event, editor, data });
+                // }}
+                onBlur={(event, editor) => {
+                  formik.setFieldValue("shortDes", editor.getData());
+                }}
+                // onFocus={(event, editor) => {
+                //   console.log("Focus.", editor);
+                // }}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Long Description</Form.Label>
+              <CKEditor
+                editor={FullEditor}
+                data={formik.values.longDes}
+                // onReady={(editor) => {
+
+                //   console.log("Editor is ready to use!", editor);
+                // }}
+                // onChange={(event, editor) => {
+                //   const data = editor.getData();
+                //   console.log({ event, editor, data });
+                // }}
+                onBlur={(event, editor) => {
+                  formik.setFieldValue("longDes", editor.getData());
+                }}
+                // onFocus={(event, editor) => {
+                //   console.log("Focus.", editor);
+                // }}
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleDescriptionModalClose}>
+            Close
+          </Button>
+          <CustomButton
+            color="primary"
+            disabled={!formik.dirty || !formik.isValid}
+            onClick={formik.handleSubmit}
+          >
+            Save
+          </CustomButton>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Edit Product */}
       <Modal
         show={modalShow}
         onHide={handleModalClose}
@@ -596,6 +719,7 @@ const ProductDetail = () => {
             </small>
           </Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
           <Form>
             <Row className="pb-3">

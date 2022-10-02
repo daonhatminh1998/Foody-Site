@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/bootstrap.min.css";
 import "./css/animate.css";
 
@@ -8,7 +9,6 @@ import "./index.css";
 import "./css/templatemo.css";
 import "react-bootstrap";
 
-// import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap.bundle";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +23,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import LoadingBar from "react-redux-loading-bar";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

@@ -16,42 +16,55 @@ const OtherHeader = (e) => {
           backgroundPosition: "top rignt",
           backgroundSize: "cover",
         }}
-        data-wow-delay="0.1s"
       >
         <Container>
-          <h1 className="display-3 mb-3 animated slideInDown">{id}</h1>
-          <nav aria-label="breadcrumb animated slideInDown">
-            <ol className="breadcrumb mb-0">
-              <li className="breadcrumb-item">
-                <Link className="text-body" to="/HomePage">
-                  Home
-                </Link>
-              </li>
+          {id ? (
+            <>
+              <h1 className="display-3 mb-3 animated slideInDown">{id}</h1>
+              <nav aria-label="breadcrumb animated slideInDown">
+                <ol className="breadcrumb mb-0">
+                  <li className="breadcrumb-item">
+                    <Link className="text-body" to="/HomePage">
+                      Home
+                    </Link>
+                  </li>
 
-              {id ? (
-                <>
                   <li className="breadcrumb-item">
                     <Link className="text-body" to={`/${label}`}>
                       {label}
                     </Link>
                   </li>
+
                   <li
                     className="breadcrumb-item text-dark active"
                     aria-current="page"
                   >
                     {id}
                   </li>
-                </>
-              ) : (
-                <li
-                  className="breadcrumb-item text-dark active"
-                  aria-current="page"
-                >
-                  {label}
-                </li>
-              )}
-            </ol>
-          </nav>
+                </ol>
+              </nav>
+            </>
+          ) : (
+            <>
+              <h1 className="display-3 mb-3 animated slideInDown">{label}</h1>
+              <nav aria-label="breadcrumb animated slideInDown">
+                <ol className="breadcrumb mb-0">
+                  <li className="breadcrumb-item">
+                    <Link className="text-body" to="/HomePage">
+                      Home
+                    </Link>
+                  </li>
+
+                  <li
+                    className="breadcrumb-item text-dark active"
+                    aria-current="page"
+                  >
+                    {label}
+                  </li>
+                </ol>
+              </nav>
+            </>
+          )}
         </Container>
       </div>
     </>
