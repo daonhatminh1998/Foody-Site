@@ -58,9 +58,10 @@ const ProductDetail = () => {
   const [productDetail, setProductDetail] = useState([]);
   const [productType, setProductType] = useState([]);
 
+  const admin = true;
+  const [totalProduct, setTotalProduct] = useState("");
   const [page, setPage] = useState(0);
   const [pageLength, setPageLength] = useState(5);
-  const admin = true;
   const [sort, setSort] = useState("");
   const [type, setType] = useState("");
   const [priceTo, setPriceTo] = useState();
@@ -69,6 +70,10 @@ const ProductDetail = () => {
   const [pagingItems, setPagingItems] = useState([]);
 
   const loadData = () => {
+    ProductDetailService.list().then((res) => {
+      setTotalProduct(res.data.length);
+    });
+
     ProductDetailService.getPaging(
       page,
       pageLength,
@@ -606,8 +611,8 @@ const ProductDetail = () => {
 
             <tbody>
               {productDetail.map((list, idx) => (
-                <tr key={list.ProDe_Id}>
-                  <td>{idx + 1}</td>
+                <tr key={idx}>
+                  <td>{idx + 1 + page * pageLength}</td>
                   <td>{list.Pro_Name}</td>
                   <td>{list.Pro_Price}</td>
                   <td>
@@ -639,7 +644,6 @@ const ProductDetail = () => {
                     <Col className="text-center">
                       <BootstrapSwitchButton
                         checked={list.is_Published === 1 ? true : false}
-                        size="smsm"
                         width={100}
                         // height={10}
                         offstyle="danger"
@@ -677,10 +681,19 @@ const ProductDetail = () => {
               ))}
             </tbody>
           </Table>
-
-          <Pagination className=" mt-3 mb-0 justify-content-end">
-            {pagingItems}
-          </Pagination>
+          <Row className="pt-3">
+            <Col>
+              <p>
+                Đang xem {page * pageLength + 1} đến {(page + 1) * pageLength}{" "}
+                trong tổng số {totalProduct} mục
+              </p>
+            </Col>
+            <Col>
+              <Pagination className="justify-content-end">
+                {pagingItems}
+              </Pagination>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
 
