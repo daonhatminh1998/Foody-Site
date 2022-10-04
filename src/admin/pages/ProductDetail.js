@@ -504,7 +504,7 @@ const ProductDetail = () => {
                       <Form.Select
                         className="bg-white"
                         value={type}
-                        onClick={handleType}
+                        onChange={handleType}
                       >
                         <option value="">Select</option>
                         {productType.map((list) => (
