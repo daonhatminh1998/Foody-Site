@@ -177,7 +177,11 @@ const Customers = () => {
         </Card.Body>
       </Card>
 
-      <Modal show={modalShow} onHide={handleModalClose} size="xl">
+      <Modal
+        show={modalShow}
+        onHide={handleModalClose}
+        dialogClassName="modal-90w"
+      >
         <Modal.Header closeButton>
           <Modal.Title>
             <span>
@@ -241,7 +245,7 @@ const Customers = () => {
           </Form>
         </Modal.Body> */}
 
-        <Modal.Body>
+        {/* <Modal.Body>
           <Row>
             <Form as={Col}>
               <Row className="mb-3">
@@ -340,8 +344,175 @@ const Customers = () => {
               </Row>
             </Form>
 
-            {/* <Card as={Col} className="border-primary me-2">
+           
+          </Row>
+        </Modal.Body> */}
 
+        <Modal.Body>
+          <Row>
+            <Form as={Col}>
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label as={Col} sm="2">
+                  Phone
+                </Form.Label>
+                <Col>
+                  <Form.Control
+                    required
+                    type="text"
+                    {...formik.getFieldProps("customer.Cus_Phone")}
+                    isValid={
+                      formik.touched.Cus_Phone && !formik.errors.Cus_Phone
+                    }
+                    isInvalid={
+                      formik.touched.Cus_Phone && formik.errors.Cus_Phone
+                    }
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formik.errors.Cus_Phone}
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Group>
+
+              <Row className="mb-3">
+                <Col sm="6">
+                  <Form.Group as={Row}>
+                    <Form.Label
+                      as={Col}
+                      lg="12"
+                      xl="4"
+                      className="align-self-center"
+                    >
+                      First name
+                    </Form.Label>
+                    <Col>
+                      <Form.Control
+                        required
+                        type="text"
+                        {...formik.getFieldProps("ORD_FirstName")}
+                        isValid={
+                          formik.touched.ORD_FirstName &&
+                          !formik.errors.ORD_FirstName
+                        }
+                        isInvalid={
+                          formik.touched.ORD_FirstName &&
+                          formik.errors.ORD_FirstName
+                        }
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.ORD_FirstName}
+                      </Form.Control.Feedback>
+                    </Col>
+                  </Form.Group>
+                </Col>
+
+                <Col sm="6">
+                  <Form.Group as={Row}>
+                    <Form.Label
+                      as={Col}
+                      lg="12"
+                      xl="4"
+                      className="align-self-center"
+                    >
+                      Last name
+                    </Form.Label>
+                    <Col>
+                      <Form.Control
+                        required
+                        type="text"
+                        {...formik.getFieldProps("ORD_LastName")}
+                        isValid={
+                          formik.touched.ORD_LastName &&
+                          !formik.errors.ORD_LastName
+                        }
+                        isInvalid={
+                          formik.touched.ORD_LastName &&
+                          formik.errors.ORD_LastName
+                        }
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {formik.errors.ORD_LastName}
+                      </Form.Control.Feedback>
+                    </Col>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label as={Col} sm="2">
+                  Email
+                </Form.Label>
+                <Col>
+                  <Form.Control
+                    required
+                    type="text"
+                    {...formik.getFieldProps("customer.Cus_Email")}
+                    isValid={
+                      formik.touched.Cus_Email && !formik.errors.Cus_Email
+                    }
+                    isInvalid={
+                      formik.touched.Cus_Email && formik.errors.Cus_Email
+                    }
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formik.errors.Cus_Email}
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Group>
+
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label as={Col} sm="2">
+                  Address
+                </Form.Label>
+                <Col>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    required
+                    type="text"
+                    {...formik.getFieldProps("ORD_Address")}
+                    isValid={
+                      formik.touched.ORD_Address && !formik.errors.ORD_Address
+                    }
+                    isInvalid={
+                      formik.touched.ORD_Address && formik.errors.ORD_Address
+                    }
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formik.errors.ORD_Address}
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Group>
+
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label as={Col} sm="2">
+                  Customer Note
+                </Form.Label>
+                <Col>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    type="text"
+                    {...formik.getFieldProps("ORD_CusNote")}
+                  />
+                </Col>
+              </Form.Group>
+
+              <Form.Group as={Row} className="mb-3">
+                <Form.Label as={Col} sm="2">
+                  Admin Note
+                </Form.Label>
+                <Col>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    type="text"
+                    {...formik.getFieldProps("ORD_AdNote")}
+                  />
+                </Col>
+              </Form.Group>
+            </Form>
+
+            <Card as={Col} className="border-primary me-2">
               <CardHeader as={Row} className="pt-3 pb-0">
                 <Card.Title as={Col}>
                   <h3>
@@ -359,6 +530,7 @@ const Customers = () => {
                   </Button>
                 </Col>
               </CardHeader>
+
               <Card.Body>
                 <Table
                   striped
@@ -380,41 +552,41 @@ const Customers = () => {
                     </tr>
                   </thead>
 
-                  <tbody>
+                  {/* <tbody>
                     {orderDetail.details ? (
-                    <>
-                      {orderDetail?.details.map((list, idx) => (
-                        <tr key={list.ORDe_Id}>
-                          <td>{idx + 1}</td>
-                          <td>{list.product_detail.Pro_Name}</td>
-                          <td>{list.ORDe_Quantity}</td>
-                          <td>{list.product_detail.Pro_Price}</td>
-                          <td>{list.ORDe_Price}</td>
+                      <>
+                        {orderDetail?.details.map((list, idx) => (
+                          <tr key={list.ORDe_Id}>
+                            <td>{idx + 1}</td>
+                            <td>{list.product_detail.Pro_Name}</td>
+                            <td>{list.ORDe_Quantity}</td>
+                            <td>{list.product_detail.Pro_Price}</td>
+                            <td>{list.ORDe_Price}</td>
 
-                          <td>
-                            <a
-                              href="/#"
-                              onClick={(e) => showEditModal(e, list.ORD_Id)}
-                            >
-                              <i className="bi-pencil-square text-primary"></i>
-                            </a>
-                            <a
-                              href="/#"
-                              onClick={(e) => handleDelete(e, list.ORD_Id)}
-                            >
-                              <i className="bi-trash text-danger"></i>
-                            </a>
-                          </td>
-                        </tr>
-                      ))}
-                    </>
-                  ) : (
-                    ""
-                  )}
-                  </tbody>
+                            <td>
+                              <a
+                                href="/#"
+                                onClick={(e) => showEditModal(e, list.ORD_Id)}
+                              >
+                                <i className="bi-pencil-square text-primary"></i>
+                              </a>
+                              <a
+                                href="/#"
+                                onClick={(e) => handleDelete(e, list.ORD_Id)}
+                              >
+                                <i className="bi-trash text-danger"></i>
+                              </a>
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    ) : (
+                      ""
+                    )}
+                  </tbody> */}
                 </Table>
               </Card.Body>
-            </Card> */}
+            </Card>
           </Row>
         </Modal.Body>
 

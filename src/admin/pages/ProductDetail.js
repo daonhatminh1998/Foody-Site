@@ -62,6 +62,7 @@ const ProductDetail = () => {
   const [pageLength, setPageLength] = useState(5);
   const admin = true;
   const [sort, setSort] = useState("");
+  const [type, setType] = useState("");
   const [priceTo, setPriceTo] = useState();
   const [priceFrom, setPriceFrom] = useState();
   const [search, setSearch] = useState("");
@@ -72,6 +73,7 @@ const ProductDetail = () => {
       page,
       pageLength,
       admin,
+      type,
       sort,
       priceFrom,
       priceTo,
@@ -288,11 +290,16 @@ const ProductDetail = () => {
   useEffect(() => {
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageLength, admin, search, sort]);
+  }, [page, pageLength, admin, type, search, sort]);
 
   const handleChangePageLength = (e) => {
     setPage(0);
     setPageLength(e.target.value);
+  };
+
+  const handleType = (e) => {
+    setPage(0);
+    setType(e.target.value);
   };
 
   const handleSearch = (e) => {
@@ -480,14 +487,35 @@ const ProductDetail = () => {
 
   return (
     <>
+      <h3 className="pt-3">
+        Product Detail <small className="text-muted">list</small>
+      </h3>
       <Card className="border-primary bt-5 mt-4">
         <CardHeader>
           <Row>
             <Col>
               <Card.Title>
-                <h3>
-                  Product Detail <small className="text-muted">list</small>
-                </h3>
+                <Form>
+                  <Form.Group as={Row} className="mb-3">
+                    <Col className="align-self-center" sm="1">
+                      <Form.Label>Type</Form.Label>
+                    </Col>
+                    <Col sm="6">
+                      <Form.Select
+                        className="bg-white"
+                        value={type}
+                        onClick={handleType}
+                      >
+                        <option value="">Select</option>
+                        {productType.map((list) => (
+                          <option key={list.Pro_Id} value={list.Pro_Id}>
+                            {list.Pro_Type}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Col>
+                  </Form.Group>
+                </Form>
               </Card.Title>
             </Col>
 
@@ -600,12 +628,35 @@ const ProductDetail = () => {
                   </td>
                   {/* <td dangerouslySetInnerHTML={{ __html: list.shortDes }}/>
                   <td dangerouslySetInnerHTML={{ __html: list.longDes }} /> */}
-                  <td>
+                  {/* <td>
                     {list.is_Published === 1 ? (
                       <i className="bi bi-check text-primary fs-3"></i>
                     ) : (
                       <i className="bi bi-x text-danger fs-3"></i>
                     )}
+                  </td> */}
+                  <td>
+                    <Col className="text-center">
+                      <BootstrapSwitchButton
+                        checked={list.is_Published === 1 ? true : false}
+                        size="smsm"
+                        width={100}
+                        // height={10}
+                        offstyle="danger"
+                        onlabel="O"
+                        offlabel="-"
+                        onChange={(checked) => {
+                          // console.log("data: ", list);
+                          list.is_Published = checked === true ? 1 : 0;
+                          let id = list.ProDe_Id;
+                          ProductDetailService.update(id, list).then((res) => {
+                            // console.log(res);
+                            toast.success("Update Success");
+                          });
+                        }}
+                      />
+                      {/* {console.log(formik)} */}
+                    </Col>
                   </td>
                   <td>
                     <a
@@ -742,6 +793,7 @@ const ProductDetail = () => {
                           }
                         />
                       </Col>
+
                       <Col>
                         <Input
                           label="Price"
