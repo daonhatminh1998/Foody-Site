@@ -129,6 +129,7 @@ export const CartProvider = ({ children }) => {
       }
     });
   }
+
   function decreaseCartQuantity(id) {
     setCartItems((currItems) => {
       if (currItems.find((item) => item.id === id)?.quantity === 1) {
@@ -144,6 +145,7 @@ export const CartProvider = ({ children }) => {
       }
     });
   }
+
   function removeFromCart(id) {
     setCartItems((currItems) => {
       return currItems.filter((item) => item.id !== id);

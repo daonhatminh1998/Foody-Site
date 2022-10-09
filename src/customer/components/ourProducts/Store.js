@@ -30,6 +30,7 @@ const Store = ({ loading }) => {
 
         <Row className="g-3">
           <Row className="g-3">
+            {console.log(productDetail)}
             {productDetail.map((product) => (
               <Col
                 md={4}
