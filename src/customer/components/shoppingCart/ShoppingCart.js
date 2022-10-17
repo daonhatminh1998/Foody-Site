@@ -101,31 +101,33 @@ export function ShoppingCart({ isOpen }) {
         backdrop={true}
       >
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Cart</Offcanvas.Title>
+          <Offcanvas.Title className="h2">Cart</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Stack gap={3}>
             {cartItems.map((item, index) => (
               <CartItem key={index} {...item} />
             ))}
-            <Row className="ms-auto fw-bold fs-5 justify-content-between">
-              <span className="w-auto me-3">Total: </span>
-
-              <span className="w-auto">
-                {formatCurrency(
-                  cartItems.reduce((total, cartItem) => {
-                    const item = productDetail.find(
-                      (i) => i.ProDe_Id === cartItem.id
-                    );
-                    return total + (item?.Pro_Price || 0) * cartItem.quantity;
-                  }, 0)
-                )}
-              </span>
-
-              <Button onClick={handleModalShow} disabled={!cartItems.length}>
-                Book Item
-              </Button>
+            <Row>
+              <Col>
+                <span className=" fw-bold fs-5">Total:</span>
+              </Col>
+              <Col sm="auto">
+                <span className="fw-bold fs-5">
+                  {formatCurrency(
+                    cartItems.reduce((total, cartItem) => {
+                      const item = productDetail.find(
+                        (i) => i.ProDe_Id === cartItem.id
+                      );
+                      return total + (item?.Pro_Price || 0) * cartItem.quantity;
+                    }, 0)
+                  )}
+                </span>
+              </Col>
             </Row>
+            <Button onClick={handleModalShow} disabled={!cartItems.length}>
+              Book Item
+            </Button>
           </Stack>
         </Offcanvas.Body>
       </Offcanvas>

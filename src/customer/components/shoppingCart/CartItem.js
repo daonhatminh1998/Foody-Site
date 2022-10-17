@@ -7,16 +7,18 @@ export function CartItem({ id, quantity }) {
     removeFromCart,
     increaseCartQuantity,
     decreaseCartQuantity,
-    products,
+    productDetail,
   } = useCart();
-  const item = products.find((i) => i.ProDe_Id === id);
-  if (item == null) return null;
+
+  const item = productDetail.find((i) => i.ProDe_Id === id);
+  if (!item) return null;
+  console.log(item);
 
   return (
     <Stack
       direction="horizontal"
       gap={2}
-      className="d-flex align-items-center py-2"
+      className="d-flex align-items-center py-2 bg-light rounded rounded-5"
       key={item.ProDe_Id}
     >
       <Row className="p-0 m-0">
@@ -28,7 +30,7 @@ export function CartItem({ id, quantity }) {
         <Col>
           <Row>
             {item.Pro_Name}
-            {formatCurrency(item.Pro_Price)}
+            {/* {formatCurrency(item.Pro_Price)} */}
           </Row>
           <Row>{quantity >= 1 ? ` x ${quantity}` : ""}</Row>
           <Row>{formatCurrency(item.Pro_Price * quantity)}</Row>
