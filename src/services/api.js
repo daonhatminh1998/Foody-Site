@@ -3,9 +3,10 @@ import store from "../store";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
-  // baseUrl: "http://localhost/foody/api/",
-  baseUrl: "https://myfoody290798.herokuapp.com/api/",
+  baseUrl: "http://localhost/foody/api/",
+  // baseUrl: "https://myfoody290798.herokuapp.com/api/",
   login: "/login",
+  update: "/update",
   products: "/products",
   productDetail: "/productDetail",
   customers: "/customers",

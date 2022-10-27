@@ -18,9 +18,10 @@ const Navbars = () => {
   const [expanded, setExpanded] = useState(false);
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
+
+  // console.log(userInfo[0]);
 
   const scrollOnTop = () => {
     window.scrollTo(0, 0);
@@ -72,6 +73,12 @@ const Navbars = () => {
               </Nav.Link>
             </Col>
 
+            <Col xs="12" xl="auto" onClick={scrollOnTop}>
+              <Nav.Link as={NavLink} to="/admin/adminPage">
+                Admin Site
+              </Nav.Link>
+            </Col>
+
             <Col xs="auto" onClick={scrollOnTop}>
               <Button
                 as={NavLink}
@@ -85,26 +92,17 @@ const Navbars = () => {
 
             {isLoggedIn ? (
               <>
-                <Col className="navbar-nav">
-                  <li className="nav-item">
-                    <Nav.Link
-                      className="nav-link"
-                      href="/#"
-                      as={NavLink}
-                      to="/admin/adminPage"
-                    >
-                      welcome to {userInfo.fullName}
-                    </Nav.Link>
-                  </li>
-                  <li className="nav-item">
-                    <a
-                      className="nav-link"
-                      href="/#"
+                <Col className="navbar-nav" onClick={scrollOnTop}>
+                  <Nav.Item>
+                    Welcome{" "}
+                    <Link to="/User" className="text-secondary">
+                      {userInfo[0].fullName}
+                    </Link>
+                    <i
                       onClick={() => dispatch(logout())}
-                    >
-                      <i className="bi-box-arrow-right"></i>
-                    </a>
-                  </li>
+                      className="bi-box-arrow-right text-primary ms-2"
+                    />
+                  </Nav.Item>
                 </Col>
               </>
             ) : (

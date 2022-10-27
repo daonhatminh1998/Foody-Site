@@ -15,9 +15,9 @@ const CustomButton = (props) => {
   return (
     <button type="button" onClick={onClick} className={btnClass} {...others}>
       {isLoading ? (
-        <div className={spinnerClass}></div>
+        <div className={spinnerClass} />
       ) : icon ? (
-        <span className={iconClass}></span>
+        <span className={iconClass} />
       ) : (
         ""
       )}

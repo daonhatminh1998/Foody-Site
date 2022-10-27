@@ -35,6 +35,7 @@ const Login = (e) => {
             userInfo: res.data,
           })
         );
+        console.log(res.data);
         navigate("/");
       } else {
         setMessage(res.message);
@@ -84,28 +85,23 @@ const Login = (e) => {
                     type="password"
                   />
 
-                  <Row>
-                    <Col className="offset-sm-3" sm="auto">
-                      <CustomButton
-                        type="submit"
-                        color="primary"
-                        disabled={isWaiting}
-                        isLoading={isWaiting}
-                      >
-                        Sign in
-                      </CustomButton>
-                    </Col>
-                    <Col>
-                      <CustomButton
-                        type="button"
-                        color="primary"
-                        className="px-3"
-                        onClick={handleBack}
-                      >
-                        Back
-                      </CustomButton>
-                    </Col>
-                  </Row>
+                  <CustomButton
+                    type="submit"
+                    color="primary"
+                    className="me-2"
+                    disabled={isWaiting}
+                    isLoading={isWaiting}
+                  >
+                    Sign in
+                  </CustomButton>
+                  <CustomButton
+                    type="button"
+                    color="primary"
+                    className="px-3"
+                    onClick={handleBack}
+                  >
+                    Back
+                  </CustomButton>
                 </Form>
               </Card.Body>
             </Card>

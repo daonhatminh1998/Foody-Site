@@ -7,6 +7,7 @@ import OurFeatures from "./pages/OurFeatures";
 import OurProducts from "./pages/OurProducts";
 import PageNotFound from "./pages/PageNotFound";
 import DetailPages from "./pages/DetailPages";
+import User from "./pages/User";
 
 const routes = [
   { path: "/", component: <HomePage /> },
@@ -19,6 +20,7 @@ const routes = [
   { path: "/OurProducts", component: <OurProducts /> },
   { path: "/PageNotFound", component: <PageNotFound /> },
   { path: "/Product/:id", component: <DetailPages /> },
+  { path: "/User", component: <User /> },
   { path: "/*", component: <PageNotFound /> },
 ];
 

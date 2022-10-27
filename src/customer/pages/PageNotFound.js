@@ -7,7 +7,7 @@ const PageNotFound = () => {
   return (
     <>
       <OtherHeader label="404 Error" />
-      <div className="container-xxl py-6 wow fadeInUp" data-wow-delay="0.1s">
+      <div className="container py-6">
         <Container className="text-center">
           <Row className=" justify-content-center">
             <Col lg={6}>
@@ -20,6 +20,7 @@ const PageNotFound = () => {
               </p>
               <Link
                 className="btn btn-primary rounded-pill py-3 px-5"
+                onClick={() => window.scrollTo(0, 0)}
                 to="/HomePage"
               >
                 Go Back To Home

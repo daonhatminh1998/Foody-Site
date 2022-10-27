@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 import ProductDetailService from "../../services/productDetailService";
 
