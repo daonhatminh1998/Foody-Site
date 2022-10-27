@@ -43,52 +43,63 @@ const User = () => {
   };
 
   return (
-    <div className="bg-light">
-      <Container className=" bg-icon mt-4 p-3">
-        <Row>
-          <Col lg={7}>
-            <Card>
-              <Card.Header>
-                <Card.Title className="text-center">
-                  <span className="text-muted h2">Hello, </span>
-                  <span className="text-primary display-1">
-                    {userInfo[0].fullName}
-                  </span>
-                  <Card.Subtitle className="mb-2 text-muted">
-                    UId: {userInfo[0].id}
-                  </Card.Subtitle>
-                </Card.Title>
-              </Card.Header>
-              <Card.Body>
-                <Card.Title className="h3">Your Information:</Card.Title>
-                <Card.Text> </Card.Text>
-                <Card.Text>User Name: {userInfo[0].username}</Card.Text>
-                <Card.Text>Phone: {userInfo[0].phone}</Card.Text>
-                <Card.Text>Email: {userInfo[0].email}</Card.Text>
-                <Card.Text>Token: {userInfo[0].token}</Card.Text>
-                <Input
-                  inputRef={passwordRef}
-                  id="txtPassword"
-                  label="Password"
-                  placeholder="Enter password"
-                  type="password"
-                />
-                <Input
-                  inputRef={newPasswordRef}
-                  id="txtNewPassword"
-                  label="New Password"
-                  placeholder="Enter new password"
-                  type="password"
-                />
+    <div className="bg-light bg-icon pb-5">
+      <Card>
+        <Card.Img
+          variant="top"
+          src={userInfo[0].bgImg}
+          style={{ height: "350px" }}
+          className=" rounded-5 rounded-top d-block"
+        />
 
-                <CustomButton color="primary" onClick={formik.handleSubmit}>
-                  Save
-                </CustomButton>
-              </Card.Body>
-              <Card.Footer className="text-muted">footer</Card.Footer>
-            </Card>
-          </Col>
-        </Row>
+        <Card.Img
+          variant="top"
+          src={userInfo[0].avatar}
+          style={{ width: "20%" }}
+          className="img-thumbnail img-fluid rounded-circle border-dark"
+        />
+
+        <Card.Title className="text-center">
+          <span className="text-muted h2">Hello, </span>
+          <span className="text-primary display-1">{userInfo[0].fullName}</span>
+          <Card.Subtitle className="mb-2 text-muted">
+            UId: {userInfo[0].id}
+          </Card.Subtitle>
+        </Card.Title>
+      </Card>
+
+      <Container className="mt-4">
+        <Card style={{ width: "100%" }}>
+          <Card.Header>
+            <Card.Title className="text-center h3">Your Information</Card.Title>
+          </Card.Header>
+
+          <Card.Body className="bg-icon">
+            <Card.Text>User Name: {userInfo[0].username}</Card.Text>
+            <Card.Text>Phone: {userInfo[0].phone}</Card.Text>
+            <Card.Text>Email: {userInfo[0].email}</Card.Text>
+            <Card.Text>Token: {userInfo[0].token}</Card.Text>
+            <Input
+              inputRef={passwordRef}
+              id="txtPassword"
+              label="Password"
+              placeholder="Enter password"
+              type="password"
+            />
+            <Input
+              inputRef={newPasswordRef}
+              id="txtNewPassword"
+              label="New Password"
+              placeholder="Enter new password"
+              type="password"
+            />
+            <CustomButton color="primary" onClick={formik.handleSubmit}>
+              Save
+            </CustomButton>
+          </Card.Body>
+
+          <Card.Footer className="text-muted">footer</Card.Footer>
+        </Card>
       </Container>
     </div>
   );

@@ -92,7 +92,7 @@ const Navbars = () => {
 
             {isLoggedIn ? (
               <>
-                <Col className="navbar-nav" onClick={scrollOnTop}>
+                <Col className="navbar-nav pt-2" onClick={scrollOnTop}>
                   <Nav.Item>
                     Welcome{" "}
                     <Link to="/User" className="text-secondary">

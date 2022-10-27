@@ -495,13 +495,13 @@ const ProductDetail = () => {
       <h3 className="pt-3">
         Product Detail <small className="text-muted">list</small>
       </h3>
-      <Card className="border-primary bt-5 mt-4">
+      <Card className="border-primary bt-5 my-4">
         <CardHeader>
           <Row>
             <Col>
               <Card.Title>
                 <Form>
-                  <Form.Group as={Row} className="mb-3">
+                  <Form.Group as={Row}>
                     <Col className="align-self-center" sm="1">
                       <Form.Label>Type</Form.Label>
                     </Col>
