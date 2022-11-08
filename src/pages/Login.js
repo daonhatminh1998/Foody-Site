@@ -4,8 +4,8 @@ import { useDispatch } from "react-redux";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import { Card, Col, Container, Form, Row } from "react-bootstrap";
 
-import userService from "../../services/userService";
-import { login } from "../../store/reducers/auth";
+import userService from "../services/userService";
+import { login } from "../store/reducers/auth";
 
 import Input from "../components/Input";
 import CustomButton from "../components/CustomButton";
@@ -31,12 +31,13 @@ const Login = (e) => {
         setMessage("Ok");
         dispatch(
           login({
-            token: res.data.token,
+            token: res.data.api_token,
             userInfo: res.data,
           })
         );
-        console.log(res.data);
+
         navigate("/");
+        window.scrollTo(0, 0);
       } else {
         setMessage(res.message);
       }
@@ -54,9 +55,9 @@ const Login = (e) => {
   };
 
   return (
-    <>
+    <div className="bg-icon bg-light">
       <Container>
-        <div style={{ height: "10rem" }}></div>
+        <div style={{ height: "10rem" }} />
         <Row className="justify-content-center align-items-center">
           <Col sm={8} lg={5}>
             <Card bg="primary">
@@ -66,7 +67,7 @@ const Login = (e) => {
                 </Card.Title>
               </CardHeader>
 
-              <Card.Body className=" bg-white">
+              <Card.Body className=" bg-white bg-icon">
                 <p className="text-center text-danger">{message}</p>
                 <Form onSubmit={handleFormSubmit}>
                   <Input
@@ -94,6 +95,7 @@ const Login = (e) => {
                   >
                     Sign in
                   </CustomButton>
+
                   <CustomButton
                     type="button"
                     color="primary"
@@ -107,8 +109,9 @@ const Login = (e) => {
             </Card>
           </Col>
         </Row>
+        <div style={{ height: "10rem" }} />
       </Container>
-    </>
+    </div>
   );
 };
 

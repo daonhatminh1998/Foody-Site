@@ -3,13 +3,19 @@ import store from "../store";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
-  baseUrl: "http://localhost/foody/api/",
+  baseUrl: "http://localhost/foody/member/",
   // baseUrl: "https://myfoody290798.herokuapp.com/api/",
-  login: "/login",
-  update: "/update",
-  products: "/products",
-  productDetail: "/productDetail",
-  customers: "/customers",
+  login: "login",
+  changePassword: "changePassword",
+  changeInfor: "changeInfor",
+  carts: "carts",
+  receiver: "receiver",
+  newReceiver: "newReceiver",
+  updateReceiver: "updateReceiver",
+  deleteReceiver: "deleteReceiver",
+
+  products: "products",
+  productDetail: "productDetail",
   orders: "orders",
   orderDetail: "orderDetail",
 };
@@ -41,7 +47,7 @@ instance.interceptors.response.use(
     setTimeout(() => store.dispatch(hideLoading()), 100);
 
     if (!error.resonse || error.resonse.status === 0) {
-      window.location.href = "/network-error";
+      // window.location.href = "/network-error";
     } else {
       switch (error.resonse.status) {
         case 401:

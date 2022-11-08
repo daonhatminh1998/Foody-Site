@@ -1,7 +1,7 @@
-import { useCart } from "../../store/Cart";
 import { Button, Card } from "react-bootstrap";
 import formatCurrency from "../../utilities/formatCurrency";
 import { Link } from "react-router-dom";
+import { useCart } from "../../store/Cart";
 const Product = ({ product }) => {
   const {
     getItemQuantity,

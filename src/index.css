@@ -669,3 +669,40 @@ div {
 /* Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
 }
+
+/*---------------------------- User -------------------------------------------------*/
+.shadow {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+.profile-tab-nav {
+  min-width: 250px;
+}
+
+.tab-content {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.nav-pills a.nav-link {
+  padding: 15px 20px;
+  color: #333;
+}
+.nav-pills a.nav-link i {
+  width: 20px;
+}
+
+.img-circle img {
+  height: 100px;
+  width: 100px;
+  border-radius: 100%;
+  border: 5px solid #fff;
+}
+
+.img {
+  height: 100px;
+  width: 100px;
+}

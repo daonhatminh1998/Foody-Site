@@ -1,4 +1,5 @@
 import React from "react";
+import { Col, Form, Row } from "react-bootstrap";
 
 class Input extends React.Component {
   render() {
@@ -18,11 +19,11 @@ class Input extends React.Component {
     const inputClass = `form-control ${errMessage ? "is-invalid" : ""} `;
 
     return (
-      <div className="row mb-3">
-        <label htmlFor={id} className={labelClass}>
+      <Form.Group as={Row} className="mb-3">
+        <Form.Label htmlFor={id} className={labelClass}>
           {label}
-        </label>
-        <div className="col-sm">
+        </Form.Label>
+        <Col>
           {others["rows"] > 1 ? (
             <textarea
               ref={inputRef}
@@ -32,7 +33,7 @@ class Input extends React.Component {
               {...formField}
             ></textarea>
           ) : (
-            <input
+            <Form.Control
               ref={inputRef}
               type="text"
               className={inputClass}
@@ -42,12 +43,14 @@ class Input extends React.Component {
             />
           )}
           {errMessage ? (
-            <div className="invalid-feedback">{errMessage}</div>
+            <Form.Control.Feedback type="invalid">
+              {errMessage}
+            </Form.Control.Feedback>
           ) : (
             ""
           )}
-        </div>
-      </div>
+        </Col>
+      </Form.Group>
     );
   }
 }

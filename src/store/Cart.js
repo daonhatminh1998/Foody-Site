@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 import { useSelector } from "react-redux";
 
-import ProductDetailService from "../../services/productDetailService";
+import ProductDetailService from "../services/productDetailService";
 
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
 import useLocalStorage from "../hooks/useLocalStorage";
@@ -15,7 +15,7 @@ export const CartProvider = ({ children }) => {
 
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
 
-  const RECORDS_PER_PAGE = 12;
+  const RECORDS_PER_PAGE = 2;
   const [productDetail, setProductDetail] = useState([]);
   const [page, setPage] = useState(0);
   const [pageLength] = useState(RECORDS_PER_PAGE);

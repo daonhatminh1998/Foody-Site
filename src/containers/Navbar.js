@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useCart } from "../store/Cart";
 import { Link, NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { logout } from "../../store/reducers/auth";
+import { logout } from ".././store/reducers/auth";
 import {
   faSearch,
   faUser,
@@ -21,8 +21,6 @@ const Navbars = () => {
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
 
-  // console.log(userInfo[0]);
-
   const scrollOnTop = () => {
     window.scrollTo(0, 0);
   };
@@ -32,7 +30,7 @@ const Navbars = () => {
       expanded={expanded}
       sticky="top"
       expand="xl"
-      className="py-lg-0 px-lg-5 bg-white"
+      className="py-lg-0 px-lg-5 bg-light bg-icon"
     >
       <Navbar.Brand className="ms-4 ms-lg-0">
         <Link to="/HomePage" onClick={scrollOnTop}>
@@ -47,7 +45,7 @@ const Navbars = () => {
         className="me-4"
       />
       <Navbar.Collapse onClick={() => setExpanded(false)}>
-        <Nav className="ms-auto p-4 p-lg-0 h4">
+        <Nav className="ms-auto p-4 p-lg-0 h4 bg-light">
           <Row
             xs={"auto"}
             className="align-items-center justify-content-evenly"
@@ -73,12 +71,6 @@ const Navbars = () => {
               </Nav.Link>
             </Col>
 
-            <Col xs="12" xl="auto" onClick={scrollOnTop}>
-              <Nav.Link as={NavLink} to="/admin/adminPage">
-                Admin Site
-              </Nav.Link>
-            </Col>
-
             <Col xs="auto" onClick={scrollOnTop}>
               <Button
                 as={NavLink}
@@ -92,11 +84,11 @@ const Navbars = () => {
 
             {isLoggedIn ? (
               <>
-                <Col className="navbar-nav pt-2" onClick={scrollOnTop}>
+                <Col className="navbar-nav pt-2 bg-light" onClick={scrollOnTop}>
                   <Nav.Item>
                     Welcome{" "}
                     <Link to="/User" className="text-secondary">
-                      {userInfo[0].fullName}
+                      {userInfo.name}
                     </Link>
                     <i
                       onClick={() => dispatch(logout())}
@@ -110,7 +102,7 @@ const Navbars = () => {
                 <Col xs="auto" onClick={scrollOnTop}>
                   <Button
                     as={NavLink}
-                    to="/admin/login"
+                    to="/Login"
                     variant="outline-primary"
                     className="rounded-circle"
                   >

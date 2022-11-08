@@ -12,7 +12,7 @@ import { CartItem } from "./CartItem";
 import { useState } from "react";
 
 import formatCurrency from "../../utilities/formatCurrency";
-import ordersServices from "../../../services/ordersServices";
+import ordersServices from "../../services/ordersServices";
 
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
