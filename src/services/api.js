@@ -51,7 +51,7 @@ instance.interceptors.response.use(
     } else {
       switch (error.resonse.status) {
         case 401:
-          window.location.href = "/login";
+          window.location.href = "/Login";
           break;
         case 403:
           window.location.href = "/no-permission";

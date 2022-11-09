@@ -12,6 +12,11 @@
   /* min-height: 10%; */
 }
 
+.modal-80w {
+  min-width: 80%;
+  /* min-height: 10%; */
+}
+
 .my-6 {
   margin-top: 6rem;
   margin-bottom: 6rem;

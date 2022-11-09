@@ -17,7 +17,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { logout } from ".././store/reducers/auth";
+import { logout, updateInfo } from ".././store/reducers/auth";
 import userService from "../services/userService";
 import ordersServices from "../services/ordersServices";
 
@@ -27,10 +27,12 @@ import { toast } from "react-toastify";
 
 import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";
+import CardHeader from "react-bootstrap/esm/CardHeader";
 
 const User = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
+
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
 
@@ -113,12 +115,23 @@ const User = () => {
 
     const name = nameRef.current.value;
     const email = emailRef.current.value;
+
     setIsWaiting(true);
 
     userService.changeInfor(name, email).then((res) => {
       setIsWaiting(false);
       if (res.errorCode === 0) {
         toast.success("update profile successful");
+        const newInfo = {
+          ...userInfo,
+          name: res.data.name,
+          email: res.data.email,
+        };
+        dispatch(
+          updateInfo({
+            userInfo: newInfo,
+          })
+        );
       } else {
         toast.error(res.message);
       }
@@ -150,7 +163,6 @@ const User = () => {
   });
 
   const receiverSubmit = (data) => {
-    console.log(data);
     if (data.id === 0) {
       setIsWaiting(true);
 
@@ -166,7 +178,7 @@ const User = () => {
       });
     } else {
       setIsWaiting(true);
-      console.log(data.id);
+
       userService.updateReceiver(data.id, data).then((res) => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
@@ -181,7 +193,7 @@ const User = () => {
   };
 
   const showEditModal = (e, id) => {
-    if (e) e.preventDefault();
+    e.preventDefault();
 
     if (id > 0) {
       userService.getReceiver(id).then((res) => {
@@ -221,12 +233,15 @@ const User = () => {
   const showOrderInfo = () => setOrderInfoModal(true);
 
   const orderFormik = useFormik({
-    // initialValues: {
-    //   id: 0,
-    //   name: "",
-    //   phone: "",
-    //   address: "",
-    // },
+    initialValues: {
+      ORD_Id: 0,
+      ORD_Code: "",
+      ORD_Name: "",
+      ORD_Address: "",
+      ORD_Phone: "",
+      ORD_CusNote: "",
+      details: "",
+    },
 
     // validationSchema: Yup.object({
     //   name: Yup.string().required("Required"),
@@ -239,16 +254,15 @@ const User = () => {
     },
   });
 
-  const showOrderInfoModal = (e, OR_Id) => {
-    if (e) e.preventDefault();
-    ordersServices.get(OR_Id).then((res) => {
+  const showOrderInfoModal = (e, ORD_Id) => {
+    e.preventDefault();
+
+    ordersServices.get(ORD_Id).then((res) => {
       if (res.errorCode === 0) {
         orderFormik.setValues(res.data);
         showOrderInfo();
       }
     });
-
-    showOrderInfo();
   };
 
   return (
@@ -768,52 +782,87 @@ const User = () => {
           </Modal>
 
           <Modal
-            dialogClassName="modal-90w"
+            dialogClassName="modal-80w"
             show={orderInfoModal}
             onHide={closeOrderInfo}
           >
-            <Modal.Header closeButton>
+            <Modal.Header className="bg-light bg-icon">
               <Modal.Title>
                 Order{" "}
                 <small className="text-muted">
-                  {/* {console.log(orderFormik.values.ORD_Code)} */}
                   {orderFormik.values.ORD_Code}
                 </small>
               </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Input
-                  label="name"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("name")}
-                  errMessage={
-                    checkReceiver.touched.name && checkReceiver.errors.name
-                  }
-                />
-                <Input
-                  label="phone"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("phone")}
-                  errMessage={
-                    checkReceiver.touched.phone && checkReceiver.errors.phone
-                  }
-                />
-                <Input
-                  label="address"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("address")}
-                  errMessage={
-                    checkReceiver.touched.address &&
-                    checkReceiver.errors.address
-                  }
-                />
-              </Form>
+
+            <Modal.Body className="bg-light bg-icon">
+              <Row>
+                <Col>
+                  <Row className="mb-3">
+                    <Col sm="3" md={5}>
+                      Receiver Name:
+                    </Col>
+                    <Col>{orderFormik.values.ORD_Name}</Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Col sm="3" md={5}>
+                      Phone:
+                    </Col>
+                    <Col>{orderFormik.values.ORD_Phone}</Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Col sm="3" lg={2}>
+                      Address:
+                    </Col>
+                    <Col>{orderFormik.values.ORD_Address}</Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Col sm="3" lg={2}>
+                      Note:
+                    </Col>
+                    <Col>{orderFormik.values.ORD_CusNote}</Col>
+                  </Row>
+                </Col>
+
+                <Card as={Col} className="border-primary me-2">
+                  <CardHeader as={Row} className="pt-3 pb-0">
+                    <Card.Title as={Col}>
+                      <h3>
+                        Order <small className="text-muted">list</small>
+                      </h3>
+                    </Card.Title>
+                  </CardHeader>
+
+                  <Card.Body>
+                    <Table
+                      striped
+                      responsive
+                      bordered
+                      hover
+                      className="text-center"
+                    >
+                      <thead>
+                        <tr className="table-primary border-primary ">
+                          <th style={{ width: "50px" }}>#</th>
+
+                          <th>Product Name</th>
+                          <th>Quantity</th>
+                          <th>Price</th>
+                          <th>Total</th>
+
+                          <th style={{ width: "80px" }}></th>
+                        </tr>
+                      </thead>
+                    </Table>
+                  </Card.Body>
+                </Card>
+              </Row>
             </Modal.Body>
-            <Modal.Footer>
+
+            <Modal.Footer className="bg-light bg-icon">
               <Button variant="secondary" onClick={closeOrderInfo}>
                 Close
               </Button>
