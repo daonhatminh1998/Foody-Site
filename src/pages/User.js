@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Card,
@@ -111,7 +111,7 @@ const User = () => {
   };
 
   const infoSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     const name = nameRef.current.value;
     const email = emailRef.current.value;
@@ -170,7 +170,15 @@ const User = () => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
           toast.success("Add Successful");
-          // loadData();
+          const newInfo = {
+            ...userInfo,
+            receiver: res.data.receiver,
+          };
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
           handleModalClose();
         } else {
           toast.error("Add Failed");
@@ -183,7 +191,15 @@ const User = () => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
           toast.success("Update Successful");
-          // loadData();
+          const newInfo = {
+            ...userInfo,
+            receiver: res.data.receiver,
+          };
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
           handleModalClose();
         } else {
           toast.error("Update Failed");
@@ -193,7 +209,7 @@ const User = () => {
   };
 
   const showEditModal = (e, id) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     if (id > 0) {
       userService.getReceiver(id).then((res) => {
@@ -209,23 +225,25 @@ const User = () => {
   };
 
   const handleDelete = (e, id) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     userService.deleteReceiver(id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
-        loadData();
+        const newInfo = {
+          ...userInfo,
+          receiver: res.data.receiver,
+        };
+        dispatch(
+          updateInfo({
+            userInfo: newInfo,
+          })
+        );
       } else {
         toast.error("Delete Failed");
       }
     });
   };
-
-  const loadData = () => {
-    // dispatch(login());
-  };
-
-  useEffect(() => {}, []);
 
   //-------------------------Show Order Info-------------------------------------------------
   const [orderInfoModal, setOrderInfoModal] = useState(false);
@@ -255,7 +273,7 @@ const User = () => {
   });
 
   const showOrderInfoModal = (e, ORD_Id) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     ordersServices.get(ORD_Id).then((res) => {
       if (res.errorCode === 0) {
