@@ -8,11 +8,14 @@ export function CartItem({ id, quantity }) {
     increaseCartQuantity,
     decreaseCartQuantity,
     productDetail,
+
+    addItem,
+    removeItem,
+    deleteItem,
   } = useCart();
 
   const item = productDetail.find((i) => i.ProDe_Id === id);
   if (!item) return null;
-  console.log(item);
 
   return (
     <Stack
@@ -67,6 +70,40 @@ export function CartItem({ id, quantity }) {
             </Col>
           </Row>
         </Col>
+
+        <Row>
+          <Col className="">
+            <Row className="row row-cols-3">
+              <Col className="p-0 m-0">
+                <Button
+                  className=""
+                  variant="warning"
+                  onClick={() => removeItem(item.ProDe_Id)}
+                >
+                  -
+                </Button>
+              </Col>
+              <Col className="p-0 m-0 ">
+                <Button
+                  className=""
+                  variant="primary"
+                  onClick={() => addItem(item.ProDe_Id)}
+                >
+                  +
+                </Button>
+              </Col>
+              <Col className="p-0 m-0">
+                <Button
+                  className=""
+                  variant="danger"
+                  onClick={() => deleteItem(item.ProDe_Id)}
+                >
+                  &times;
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       </Row>
     </Stack>
   );

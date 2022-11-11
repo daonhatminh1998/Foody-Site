@@ -8,9 +8,15 @@ const Product = ({ product }) => {
     increaseCartQuantity,
     decreaseCartQuantity,
     removeFromCart,
+
+    getItem,
+    addItem,
+    removeItem,
+    deleteItem,
   } = useCart();
 
   const quantity = getItemQuantity(product.ProDe_Id);
+  const itemQuantity = getItem(product.ProDe_Id);
 
   return (
     <>
@@ -45,6 +51,7 @@ const Product = ({ product }) => {
               {formatCurrency(product.Pro_Price)}
             </span>
           </Card.Title>
+
           <div className="mt-auto">
             {quantity === 0 ? (
               <Button
@@ -82,6 +89,44 @@ const Product = ({ product }) => {
                   size="small"
                   style={{ borderRadius: "10px" }}
                   onClick={() => removeFromCart(product.ProDe_Id)}
+                >
+                  Remove
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-auto">
+            {itemQuantity === 0 ? (
+              <Button
+                className="w-100"
+                onClick={() => addItem(product.ProDe_Id)}
+              >
+                + Add to Cart
+              </Button>
+            ) : (
+              <div
+                className="d-flex align-items-center flex-column"
+                style={{ gap: "0.25rem" }}
+              >
+                <div
+                  className="d-flex align-items-center justify-content-center"
+                  style={{ gap: "1rem" }}
+                >
+                  <Button onClick={() => removeItem(product.ProDe_Id)}>
+                    -
+                  </Button>
+                  <div>
+                    <span className="fs-3">{itemQuantity} </span>
+                    in cart
+                  </div>
+                  <Button onClick={() => addItem(product.ProDe_Id)}>+</Button>
+                </div>
+                <Button
+                  variant="danger"
+                  size="small"
+                  style={{ borderRadius: "10px" }}
+                  onClick={() => deleteItem(product.ProDe_Id)}
                 >
                   Remove
                 </Button>

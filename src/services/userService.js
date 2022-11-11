@@ -1,4 +1,6 @@
 import api from "./api";
+
+//--------------------------------Member Information------------------------------------------------
 const login = (username, password) => {
   const data = { username, password };
   return api.post(api.url.login, data);
@@ -14,6 +16,23 @@ const changeInfor = (name, email, avatar, bgImg) => {
   return api.post(api.url.changeInfor, data);
 };
 
+//--------------------------------Member Cart------------------------------------------------
+
+const addQuantity = (ProDe_Id) => {
+  const data = { ProDe_Id };
+  return api.post(api.url.addQuantity, data);
+};
+const removeQuantity = (ProDe_Id) => {
+  const data = { ProDe_Id };
+  return api.post(api.url.removeQuantity, data);
+};
+const deleteItem = (ProDe_Id) => {
+  const data = { ProDe_Id };
+  return api.post(api.url.deleteItem, data);
+};
+const deleteAll = () => api.delete(api.url.deleteAll);
+
+//--------------------------------Member Receiver------------------------------------------------
 const getReceiver = (id) => api.get(`${api.url.receiver}/${id}`);
 const newReceiver = (data) => api.post(api.url.newReceiver, data);
 const updateReceiver = (id, data) =>
@@ -24,6 +43,12 @@ const userService = {
   login,
   changePassword,
   changeInfor,
+
+  addQuantity,
+  removeQuantity,
+  deleteItem,
+  deleteAll,
+
   getReceiver,
   newReceiver,
   updateReceiver,

@@ -20,7 +20,8 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, productDetail, clearCart } = useCart();
+  const { closeCart, cartItem, productDetail, clearCart, deleteAll } =
+    useCart();
 
   const [modalShow, setShowModal] = useState(false);
   const handleModalClose = () => setShowModal(false);
@@ -28,7 +29,7 @@ export function ShoppingCart({ isOpen }) {
   const navigate = useNavigate();
 
   const handleFormSubmit = (data) => {
-    const details = cartItems.map((item) => ({
+    const details = cartItem.map((item) => ({
       ProDe_Id: item.id,
       ORDe_Quantity: item.quantity,
     }));
@@ -102,10 +103,13 @@ export function ShoppingCart({ isOpen }) {
       >
         <Offcanvas.Header closeButton>
           <Offcanvas.Title className="h2">Cart</Offcanvas.Title>
+          <Button className="" variant="warning" onClick={() => deleteAll()}>
+            Clear All
+          </Button>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Stack gap={3}>
-            {cartItems.map((item, index) => (
+            {cartItem.map((item, index) => (
               <CartItem key={index} {...item} />
             ))}
             <Row>
@@ -115,7 +119,7 @@ export function ShoppingCart({ isOpen }) {
               <Col sm="auto">
                 <span className="fw-bold fs-5">
                   {formatCurrency(
-                    cartItems.reduce((total, cartItem) => {
+                    cartItem.reduce((total, cartItem) => {
                       const item = productDetail.find(
                         (i) => i.ProDe_Id === cartItem.id
                       );
@@ -125,7 +129,8 @@ export function ShoppingCart({ isOpen }) {
                 </span>
               </Col>
             </Row>
-            <Button onClick={handleModalShow} disabled={!cartItems.length}>
+
+            <Button onClick={handleModalShow} disabled={!cartItem.length}>
               Book Item
             </Button>
           </Stack>

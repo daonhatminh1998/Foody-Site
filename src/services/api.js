@@ -8,7 +8,12 @@ const url = {
   login: "login",
   changePassword: "changePassword",
   changeInfor: "changeInfor",
-  carts: "carts",
+
+  addQuantity: "addQuantity",
+  removeQuantity: "removeQuantity",
+  deleteItem: "deleteItem",
+  deleteAll: "deleteAll",
+
   receiver: "receiver",
   newReceiver: "newReceiver",
   updateReceiver: "updateReceiver",

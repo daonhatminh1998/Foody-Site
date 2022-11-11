@@ -11,7 +11,6 @@ const Store = ({ loading }) => {
   if (loading) {
     return (
       <Container className="container-xxl py-5">
-        {/* {console.log("This is Product's Page")} */}
         <Row className=" g-0 gx-5 align-items-end">
           <Col lg={6}>
             <div
@@ -30,7 +29,6 @@ const Store = ({ loading }) => {
 
         <Row className="g-3">
           <Row className="g-3">
-            {console.log(productDetail)}
             {productDetail.map((product) => (
               <Col
                 md={4}
@@ -51,7 +49,6 @@ const Store = ({ loading }) => {
   }
   return (
     <Container className="container-xxl py-5">
-      {/* {console.log("This is Product's Page")} */}
       <Row className=" g-0 gx-5 align-items-end">
         <Col lg={6}>
           <div

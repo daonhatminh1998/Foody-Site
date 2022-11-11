@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
-import { useSelector } from "react-redux";
+
+import { useDispatch, useSelector } from "react-redux";
+import { logout, updateInfo } from ".././store/reducers/auth";
+import userService from "../services/userService";
 
 import ProductDetailService from "../services/productDetailService";
 
@@ -11,20 +14,18 @@ const CartStateContext = createContext();
 export const useCart = () => useContext(CartStateContext);
 
 export const CartProvider = ({ children }) => {
-  // authSlice = createSlice
+  // trạng thái giỏ hàng
 
-  const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
+  const [isOpen, setIsOpen] = useState(false);
+  const openCart = () => setIsOpen(true);
+  const closeCart = () => setIsOpen(false);
 
-  const RECORDS_PER_PAGE = 2;
+  //---------------------Product List------------------------------------------
+  const RECORDS_PER_PAGE = 6;
   const [productDetail, setProductDetail] = useState([]);
   const [page, setPage] = useState(0);
   const [pageLength] = useState(RECORDS_PER_PAGE);
   const [pagingItems, setPagingItems] = useState([]);
-
-  const cartQuantity = cartItems.reduce(
-    (quantity, item) => item.quantity + quantity,
-    0
-  );
 
   const loadData = () => {
     ProductDetailService.getPaging(page, pageLength).then((res) => {
@@ -105,12 +106,114 @@ export const CartProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageLength]);
 
-  // trạng thái giỏ hàng
-  const [isOpen, setIsOpen] = useState(false);
-  const openCart = () => setIsOpen(true);
-  const closeCart = () => setIsOpen(false);
+  //---------------------BackEnd (New)------------------------------------------
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const dispatch = useDispatch();
 
-  //action(reducer)
+  var cartItem = [];
+  if (isLoggedIn) {
+    cartItem = userInfo.cart.cart_detail.map((item) => ({
+      id: item.ProDe_Id,
+      quantity: item.CartDe_Quantity,
+    }));
+  }
+
+  const totalItem = cartItem.reduce(() => cartItem.length, 0);
+
+  function getItem(id) {
+    return cartItem.find((item) => item.id === id)?.quantity || 0;
+  }
+
+  function addItem(id) {
+    if (isLoggedIn) {
+      userService.addQuantity(id).then((res) => {
+        if (res.errorCode === 0) {
+          const newInfo = {
+            ...userInfo,
+            cart: res.data[1],
+          };
+
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
+        }
+      });
+    } else {
+      console.log("please Login");
+    }
+  }
+
+  function removeItem(id) {
+    if (isLoggedIn) {
+      userService.removeQuantity(id).then((res) => {
+        if (res.errorCode === 0) {
+          const newInfo = {
+            ...userInfo,
+            cart: res.data[1],
+          };
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
+        }
+      });
+    } else {
+      console.log("please Login");
+    }
+  }
+
+  function deleteItem(id) {
+    if (isLoggedIn) {
+      userService.deleteItem(id).then((res) => {
+        if (res.errorCode === 0) {
+          const newInfo = {
+            ...userInfo,
+            cart: res.data[1],
+          };
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
+        }
+      });
+    } else {
+      console.log("please Login");
+    }
+  }
+
+  function deleteAll() {
+    if (isLoggedIn) {
+      userService.deleteAll().then((res) => {
+        if (res.errorCode === 0) {
+          const newInfo = {
+            ...userInfo,
+            cart: res.data[1],
+          };
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
+        }
+      });
+    } else {
+      console.log("please Login");
+    }
+  }
+
+  //---------------------FrontEnd (Old)------------------------------------------
+  const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
+
+  const cartQuantity = cartItems.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  );
+
   function getItemQuantity(id) {
     return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
@@ -162,15 +265,24 @@ export const CartProvider = ({ children }) => {
       value={{
         pagingItems,
         productDetail,
+        openCart,
+        closeCart,
+
         getItemQuantity,
         increaseCartQuantity,
         decreaseCartQuantity,
         removeFromCart,
         clearCart,
-        openCart,
-        closeCart,
         cartItems,
         cartQuantity,
+
+        getItem,
+        addItem,
+        removeItem,
+        deleteItem,
+        deleteAll,
+        cartItem,
+        totalItem,
       }}
     >
       {children}
