@@ -741,6 +741,7 @@ const User = () => {
             </CardGroup>
           </Container>
 
+          {/* -------------------------Receiver (get add update delete)------------------------------------------- */}
           <Modal show={modalShow} onHide={handleModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>
@@ -799,6 +800,7 @@ const User = () => {
             </Modal.Footer>
           </Modal>
 
+          {/* -------------------------Show Order Info------------------------------------------------- */}
           <Modal
             dialogClassName="modal-80w"
             show={orderInfoModal}
