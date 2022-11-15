@@ -2,13 +2,12 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
 import { useDispatch, useSelector } from "react-redux";
-import { logout, updateInfo } from ".././store/reducers/auth";
+import { updateInfo } from ".././store/reducers/auth";
 import userService from "../services/userService";
 
 import ProductDetailService from "../services/productDetailService";
 
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
-import useLocalStorage from "../hooks/useLocalStorage";
 
 const CartStateContext = createContext();
 export const useCart = () => useContext(CartStateContext);
@@ -116,13 +115,39 @@ export const CartProvider = ({ children }) => {
     cartItem = userInfo.cart.cart_detail.map((item) => ({
       id: item.ProDe_Id,
       quantity: item.CartDe_Quantity,
+      select: item.is_Selected,
+      price: item.CartDe_Price,
     }));
   }
 
-  const totalItem = cartItem.reduce(() => cartItem.length, 0);
+  const totalItem = cartItem.reduce(
+    (quantity, item) => item.quantity + quantity,
+    0
+  );
 
   function getItem(id) {
     return cartItem.find((item) => item.id === id)?.quantity || 0;
+  }
+
+  function selectItem(id, select) {
+    if (isLoggedIn) {
+      userService.selectItem(id, select).then((res) => {
+        if (res.errorCode === 0) {
+          const newInfo = {
+            ...userInfo,
+            cart: res.data[1],
+          };
+
+          dispatch(
+            updateInfo({
+              userInfo: newInfo,
+            })
+          );
+        }
+      });
+    } else {
+      console.log("please Login");
+    }
   }
 
   function addItem(id) {
@@ -206,60 +231,6 @@ export const CartProvider = ({ children }) => {
     }
   }
 
-  //---------------------FrontEnd (Old)------------------------------------------
-  const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
-
-  const cartQuantity = cartItems.reduce(
-    (quantity, item) => item.quantity + quantity,
-    0
-  );
-
-  function getItemQuantity(id) {
-    return cartItems.find((item) => item.id === id)?.quantity || 0;
-  }
-
-  function increaseCartQuantity(id) {
-    setCartItems((currItems) => {
-      if (currItems.find((item) => item.id === id) == null) {
-        return [...currItems, { id, quantity: 1 }];
-      } else {
-        return currItems.map((item) => {
-          if (item.id === id) {
-            return { ...item, quantity: item.quantity + 1 };
-          } else {
-            return item;
-          }
-        });
-      }
-    });
-  }
-
-  function decreaseCartQuantity(id) {
-    setCartItems((currItems) => {
-      if (currItems.find((item) => item.id === id)?.quantity === 1) {
-        return currItems.filter((item) => item.id !== id);
-      } else {
-        return currItems.map((item) => {
-          if (item.id === id) {
-            return { ...item, quantity: item.quantity - 1 };
-          } else {
-            return item;
-          }
-        });
-      }
-    });
-  }
-
-  function removeFromCart(id) {
-    setCartItems((currItems) => {
-      return currItems.filter((item) => item.id !== id);
-    });
-  }
-
-  const clearCart = () => {
-    setCartItems([]);
-  };
-
   return (
     <CartStateContext.Provider
       value={{
@@ -268,15 +239,8 @@ export const CartProvider = ({ children }) => {
         openCart,
         closeCart,
 
-        getItemQuantity,
-        increaseCartQuantity,
-        decreaseCartQuantity,
-        removeFromCart,
-        clearCart,
-        cartItems,
-        cartQuantity,
-
         getItem,
+        selectItem,
         addItem,
         removeItem,
         deleteItem,

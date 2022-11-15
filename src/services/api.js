@@ -9,6 +9,7 @@ const url = {
   changePassword: "changePassword",
   changeInfor: "changeInfor",
 
+  selectItem: "selectItem",
   addQuantity: "addQuantity",
   removeQuantity: "removeQuantity",
   deleteItem: "deleteItem",
@@ -18,6 +19,8 @@ const url = {
   newReceiver: "newReceiver",
   updateReceiver: "updateReceiver",
   deleteReceiver: "deleteReceiver",
+
+  order: "order",
 
   products: "products",
   productDetail: "productDetail",

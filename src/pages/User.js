@@ -32,6 +32,7 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 const User = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
+  const dispatch = useDispatch();
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
@@ -40,7 +41,6 @@ const User = () => {
   const passwordRef = React.useRef();
   const newPasswordRef = React.useRef();
   const confirmPasswordRef = React.useRef();
-  const dispatch = useDispatch();
 
   const formik = useFormik({
     initialValues: {
@@ -353,11 +353,13 @@ const User = () => {
                   <Col>
                     <Card className=" border-0 pt-4 ">
                       <Tab.Content>
+                        {/* -------------------------Account Info------------------------------------------- */}
+
                         <Tab.Pane
                           eventKey="account"
                           className="px-lg-5 pt-lg-2 px-sm-2"
                         >
-                          <h1 className="pt-lg-2">Account</h1>
+                          <h1 className="pt-lg-2 ">Account</h1>
                           <Container className="bg-light bg-icon rounded-4 py-5">
                             <Row sm={1}>
                               <Col>
@@ -500,6 +502,7 @@ const User = () => {
                             </CustomButton>
                           </Form>
                         </Tab.Pane>
+                        {/* -------------------------Edit Profile------------------------------------------- */}
 
                         <Tab.Pane
                           eventKey="edit-profile"
@@ -579,11 +582,13 @@ const User = () => {
                           </Form>
                         </Tab.Pane>
 
+                        {/* -------------------------Receiver------------------------------------------- */}
+
                         <Tab.Pane
                           eventKey="receiver"
                           className="px-lg-5 pt-lg-2 px-sm-2"
                         >
-                          <h1 className="pt-lg-2 pb-3">Receiver</h1>
+                          <h1 className="pt-lg-2 pb-3 ">Receiver</h1>
 
                           <Table
                             responsive
@@ -595,7 +600,9 @@ const User = () => {
                                 <>
                                   {userInfo.receiver.map((list) => (
                                     <tr key={list.id}>
-                                      <td className="py-3">{list.is_Chosen}</td>
+                                      <td className="py-3">
+                                        {list.is_Default}
+                                      </td>
                                       <td className="border-bottom border-dark py-3">
                                         <Row sm={1}>
                                           <Col>
@@ -604,7 +611,7 @@ const User = () => {
                                           <Col className="text-muted fs-6">
                                             {list.address}
                                           </Col>
-                                          {list.is_Chosen ? (
+                                          {list.is_Default ? (
                                             <Col sm={12} className=" fs-6 pt-2">
                                               <span className="text-danger border border-2 border-danger px-2">
                                                 Default
@@ -662,6 +669,8 @@ const User = () => {
                             </tbody>
                           </Table>
                         </Tab.Pane>
+
+                        {/* -------------------------Order History------------------------------------------- */}
 
                         <Tab.Pane
                           eventKey="order-history"
@@ -741,7 +750,7 @@ const User = () => {
             </CardGroup>
           </Container>
 
-          {/* -------------------------Receiver (get add update delete)------------------------------------------- */}
+          {/* -------------------------Modal Receiver (get add update delete)------------------------------------------- */}
           <Modal show={modalShow} onHide={handleModalClose}>
             <Modal.Header closeButton>
               <Modal.Title>
@@ -800,7 +809,7 @@ const User = () => {
             </Modal.Footer>
           </Modal>
 
-          {/* -------------------------Show Order Info------------------------------------------------- */}
+          {/* -------------------------Modal Order Info------------------------------------------------- */}
           <Modal
             dialogClassName="modal-80w"
             show={orderInfoModal}

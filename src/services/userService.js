@@ -18,6 +18,10 @@ const changeInfor = (name, email, avatar, bgImg) => {
 
 //--------------------------------Member Cart------------------------------------------------
 
+const selectItem = (ProDe_Id, is_Selected) => {
+  const data = { ProDe_Id, is_Selected };
+  return api.post(api.url.selectItem, data);
+};
 const addQuantity = (ProDe_Id) => {
   const data = { ProDe_Id };
   return api.post(api.url.addQuantity, data);
@@ -39,11 +43,18 @@ const updateReceiver = (id, data) =>
   api.put(`${api.url.updateReceiver}/${id}`, data);
 const deleteReceiver = (id) => api.delete(`${api.url.deleteReceiver}/${id}`);
 
+//--------------------------------Member Order------------------------------------------------
+const order = (id) => {
+  const data = { id };
+  return api.post(api.url.order, data);
+};
+
 const userService = {
   login,
   changePassword,
   changeInfor,
 
+  selectItem,
   addQuantity,
   removeQuantity,
   deleteItem,
@@ -53,6 +64,8 @@ const userService = {
   newReceiver,
   updateReceiver,
   deleteReceiver,
+
+  order,
 };
 
 export default userService;

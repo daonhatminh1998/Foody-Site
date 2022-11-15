@@ -14,7 +14,7 @@ import { useSelector } from "react-redux/es/exports";
 import { useDispatch } from "react-redux";
 
 const Navbars = () => {
-  const { openCart, cartQuantity, totalItem } = useCart();
+  const { openCart, totalItem } = useCart();
   const [expanded, setExpanded] = useState(false);
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -111,39 +111,6 @@ const Navbars = () => {
                 </Col>
               </>
             )}
-
-            <Col xs="auto">
-              <Button
-                onClick={openCart}
-                style={{
-                  width: "2.5rem",
-                  height: "2.5rem",
-                  position: "relative",
-                }}
-                variant="outline-primary"
-                className="rounded-circle "
-              >
-                <FontAwesomeIcon
-                  icon={faShoppingBag}
-                  size="1x"
-                  color="#3cb815"
-                />
-                <div
-                  className="rounded-circle d-flex justify-content-center bg-danger align-items-center"
-                  style={{
-                    color: "white",
-                    width: "1.25rem",
-                    height: "1.25rem",
-                    position: "absolute",
-                    bottom: 0,
-                    right: 0,
-                    transform: "translate(25%,25%)",
-                  }}
-                >
-                  {cartQuantity}
-                </div>
-              </Button>
-            </Col>
 
             <Col xs="auto">
               <Button
