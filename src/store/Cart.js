@@ -3,8 +3,8 @@ import { Pagination } from "react-bootstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 import { updateInfo } from ".././store/reducers/auth";
-import userService from "../services/userService";
 
+import userService from "../services/userService";
 import ProductDetailService from "../services/productDetailService";
 
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
@@ -112,12 +112,14 @@ export const CartProvider = ({ children }) => {
 
   var cartItem = [];
   if (isLoggedIn) {
-    cartItem = userInfo.cart.cart_detail.map((item) => ({
-      id: item.ProDe_Id,
-      quantity: item.CartDe_Quantity,
-      select: item.is_Selected,
-      price: item.CartDe_Price,
-    }));
+    if (userInfo.cart.cart_detail.length) {
+      cartItem = userInfo.cart.cart_detail.map((item) => ({
+        id: item.ProDe_Id,
+        quantity: item.CartDe_Quantity,
+        select: item.is_Selected,
+        price: item.CartDe_Price,
+      }));
+    }
   }
 
   const totalItem = cartItem.reduce(

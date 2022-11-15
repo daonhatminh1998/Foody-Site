@@ -4,7 +4,7 @@ import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
   baseUrl: "http://localhost/foody/member/",
-  // baseUrl: "https://myfoody290798.herokuapp.com/api/",
+  // baseUrl: "https://myfoody290798.herokuapp.com/member/",
   login: "login",
   changePassword: "changePassword",
   changeInfor: "changeInfor",

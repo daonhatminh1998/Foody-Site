@@ -12,17 +12,17 @@ const DefaultLayout = () => {
       <CartProvider>
         <Header />
         <Navbar />
-        <Suspense
+        {/* <Suspense
           fallback={
             <span className="spinner-border spinner-border-lg text-black" />
           }
-        >
-          <Routes>
-            {routes.map((route, idx) => (
-              <Route key={idx} path={route.path} element={route.component} />
-            ))}
-          </Routes>
-        </Suspense>
+        > */}
+        <Routes>
+          {routes.map((route, idx) => (
+            <Route key={idx} path={route.path} element={route.component} />
+          ))}
+        </Routes>
+        {/* </Suspense> */}
         <Footer />
       </CartProvider>
     </>

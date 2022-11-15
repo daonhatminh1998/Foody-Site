@@ -8,15 +8,9 @@ import formatCurrency from "../utilities/formatCurrency";
 
 const DetailPages = () => {
   const { id } = useParams();
-  const {
-    productDetail,
-    getItemQuantity,
-    increaseCartQuantity,
-    decreaseCartQuantity,
-    removeFromCart,
-  } = useCart();
+  const { productDetail, getItem, addItem, removeItem, deleteItem } = useCart();
 
-  const quantity = getItemQuantity(Number(id));
+  const quantity = getItem(Number(id));
 
   return productDetail
     .filter((index) => index.ProDe_Id === Number(id))
@@ -92,9 +86,7 @@ const DetailPages = () => {
                   {quantity === 0 ? (
                     <Row>
                       <Col className=" d-grid ">
-                        <Button
-                          onClick={() => increaseCartQuantity(index.ProDe_Id)}
-                        >
+                        <Button onClick={() => addItem(index.ProDe_Id)}>
                           + Add to Cart
                         </Button>
                       </Col>
@@ -108,9 +100,7 @@ const DetailPages = () => {
                         className="d-flex align-items-center justify-content-center"
                         style={{ gap: "1rem" }}
                       >
-                        <Button
-                          onClick={() => decreaseCartQuantity(index.ProDe_Id)}
-                        >
+                        <Button onClick={() => removeItem(index.ProDe_Id)}>
                           -
                         </Button>
                         <div>
@@ -118,9 +108,7 @@ const DetailPages = () => {
                           in cart
                         </div>
 
-                        <Button
-                          onClick={() => increaseCartQuantity(index.ProDe_Id)}
-                        >
+                        <Button onClick={() => addItem(index.ProDe_Id)}>
                           +
                         </Button>
                       </div>
@@ -128,7 +116,7 @@ const DetailPages = () => {
                         variant="danger"
                         size="small"
                         style={{ borderRadius: "10px" }}
-                        onClick={() => removeFromCart(index.ProDe_Id)}
+                        onClick={() => deleteItem(index.ProDe_Id)}
                       >
                         Remove
                       </Button>

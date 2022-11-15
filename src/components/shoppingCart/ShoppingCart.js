@@ -2,7 +2,6 @@ import {
   Button,
   Col,
   Form,
-  FormGroup,
   Modal,
   Offcanvas,
   Row,
@@ -113,7 +112,6 @@ export function ShoppingCart({ isOpen }) {
 
   const showEditModal = (e, id) => {
     if (e) e.preventDefault();
-
     if (id > 0) {
       userService.getReceiver(id).then((res) => {
         if (res.errorCode === 0) {
@@ -148,9 +146,11 @@ export function ShoppingCart({ isOpen }) {
     });
   };
 
+  //-------------------------Order Submit-------------------------------------------------
+
   const formiks = useFormik({
     initialValues: {
-      id: "",
+      id: 0,
     },
 
     onSubmit: (values) => {
@@ -158,30 +158,24 @@ export function ShoppingCart({ isOpen }) {
     },
   });
 
-  const hello = (e) => {
-    if (e) e.preventDefault();
-    formiks.setFieldValue("id", e.target.value);
-  };
-
   const orderSubmit = (e) => {
     if (e) e.preventDefault();
 
-    console.log(formiks.values.id);
-    // userService.order(formiks.values.id).then((res) => {
-    //   if (res.errorCode === 0) {
-    //     console.log(res);
-    //     const newInfo = {
-    //       ...userInfo,
-    //       cart: res.data[1],
-    //     };
-    //     dispatch(
-    //       updateInfo({
-    //         userInfo: newInfo,
-    //       })
-    //     );
-    //     closeReceiverModal();
-    //   }
-    // });
+    userService.order(formiks.values.id).then((res) => {
+      if (res.errorCode === 0) {
+        const newInfo = {
+          ...userInfo,
+          cart: res.data.cart,
+          order: res.data.order,
+        };
+        dispatch(
+          updateInfo({
+            userInfo: newInfo,
+          })
+        );
+        closeReceiverModal();
+      }
+    });
   };
 
   return (
@@ -261,14 +255,19 @@ export function ShoppingCart({ isOpen }) {
                                 name="receiver"
                                 value={list.id}
                                 defaultChecked
-                                onChange={hello}
+                                onChange={(e) => {
+                                  formiks.setFieldValue("id", e.target.value);
+                                }}
                               />
                             ) : (
                               <Form.Check
                                 type="radio"
                                 name="receiver"
                                 value={list.id}
-                                onChange={hello}
+                                // onChange={hello}
+                                onChange={(e) => {
+                                  formiks.setFieldValue("id", e.target.value);
+                                }}
                               />
                             )}
                           </td>
