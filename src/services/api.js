@@ -16,6 +16,9 @@ const url = {
   deleteAll: "deleteAll",
 
   receiver: "receiver",
+  default: "default",
+  chosen: "chosen",
+  reset: "reset",
   newReceiver: "newReceiver",
   updateReceiver: "updateReceiver",
   deleteReceiver: "deleteReceiver",

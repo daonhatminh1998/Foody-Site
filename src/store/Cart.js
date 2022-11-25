@@ -137,7 +137,7 @@ export const CartProvider = ({ children }) => {
         if (res.errorCode === 0) {
           const newInfo = {
             ...userInfo,
-            cart: res.data[1],
+            cart: res.data.cart,
           };
 
           dispatch(
@@ -158,7 +158,7 @@ export const CartProvider = ({ children }) => {
         if (res.errorCode === 0) {
           const newInfo = {
             ...userInfo,
-            cart: res.data[1],
+            cart: res.data.cart,
           };
 
           dispatch(
@@ -179,7 +179,7 @@ export const CartProvider = ({ children }) => {
         if (res.errorCode === 0) {
           const newInfo = {
             ...userInfo,
-            cart: res.data[1],
+            cart: res.data.cart,
           };
           dispatch(
             updateInfo({
@@ -199,7 +199,7 @@ export const CartProvider = ({ children }) => {
         if (res.errorCode === 0) {
           const newInfo = {
             ...userInfo,
-            cart: res.data[1],
+            cart: res.data.cart,
           };
           dispatch(
             updateInfo({

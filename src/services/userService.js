@@ -38,6 +38,16 @@ const deleteAll = () => api.delete(api.url.deleteAll);
 
 //--------------------------------Member Receiver------------------------------------------------
 const getReceiver = (id) => api.get(`${api.url.receiver}/${id}`);
+const defaultReceiver = (Re_Id) => {
+  const data = { Re_Id };
+  return api.post(api.url.default, data);
+};
+const chosenReceiver = (Re_Id) => {
+  const data = { Re_Id };
+  return api.post(api.url.chosen, data);
+};
+const reset = () => api.post(api.url.reset);
+
 const newReceiver = (data) => api.post(api.url.newReceiver, data);
 const updateReceiver = (id, data) =>
   api.put(`${api.url.updateReceiver}/${id}`, data);
@@ -61,6 +71,9 @@ const userService = {
   deleteAll,
 
   getReceiver,
+  defaultReceiver,
+  chosenReceiver,
+  reset,
   newReceiver,
   updateReceiver,
   deleteReceiver,

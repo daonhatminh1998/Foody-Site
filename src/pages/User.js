@@ -139,16 +139,18 @@ const User = () => {
   };
 
   //-------------------------Receiver (get add update delete)-------------------------------------------
-  const [modalShow, setShowModal] = useState(false);
-  const handleModalClose = () => setShowModal(false);
-  const handleModalShow = () => setShowModal(true);
+
+  const [receiverModal, setReceiverModal] = useState(false);
+  const closeReceiverModal = () => setReceiverModal(false);
+  const showReceiverModal = () => setReceiverModal(true);
 
   const checkReceiver = useFormik({
     initialValues: {
-      id: 0,
+      Re_Id: 0,
       name: "",
       phone: "",
       address: "",
+      is_Default: 0,
     },
 
     validationSchema: Yup.object({
@@ -163,7 +165,7 @@ const User = () => {
   });
 
   const receiverSubmit = (data) => {
-    if (data.id === 0) {
+    if (data.Re_Id === 0) {
       setIsWaiting(true);
 
       userService.newReceiver(data).then((res) => {
@@ -179,15 +181,15 @@ const User = () => {
               userInfo: newInfo,
             })
           );
-          handleModalClose();
+          closeReceiverModal();
         } else {
-          toast.error("Add Failed");
+          toast.error(res.message);
         }
       });
     } else {
       setIsWaiting(true);
 
-      userService.updateReceiver(data.id, data).then((res) => {
+      userService.updateReceiver(data.Re_Id, data).then((res) => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
           toast.success("Update Successful");
@@ -200,34 +202,36 @@ const User = () => {
               userInfo: newInfo,
             })
           );
-          handleModalClose();
+          closeReceiverModal();
         } else {
-          toast.error("Update Failed");
+          toast.error(res.message);
         }
       });
     }
   };
 
-  const showEditModal = (e, id) => {
+  const showEditModal = (e, Re_Id) => {
     if (e) e.preventDefault();
 
-    if (id > 0) {
-      userService.getReceiver(id).then((res) => {
+    if (Re_Id > 0) {
+      userService.getReceiver(Re_Id).then((res) => {
         if (res.errorCode === 0) {
           checkReceiver.setValues(res.data);
-          handleModalShow();
+          showReceiverModal();
+        } else {
+          toast.error(res.message);
         }
       });
     } else {
       checkReceiver.resetForm();
-      handleModalShow();
+      showReceiverModal();
     }
   };
 
-  const handleDelete = (e, id) => {
+  const handleDelete = (e, Re_Id) => {
     if (e) e.preventDefault();
 
-    userService.deleteReceiver(id).then((res) => {
+    userService.deleteReceiver(Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
         const newInfo = {
@@ -240,7 +244,52 @@ const User = () => {
           })
         );
       } else {
-        toast.error("Delete Failed");
+        toast.error(res.message);
+      }
+    });
+  };
+
+  //-------------------------Receiver (default)-------------------------------------------
+
+  const [defaultModal, setDefaultModal] = useState(false);
+  const closeDefaultModal = () => setDefaultModal(false);
+  const showDefaultModal = () => setDefaultModal(true);
+
+  const checkDefault = useFormik({
+    initialValues: {
+      Re_Id: 0,
+      is_Default: "",
+    },
+
+    onSubmit: (values) => {
+      defaultSubmit(values);
+    },
+  });
+
+  const defaultReceiver = (e, Re_Id, is_Default) => {
+    if (e) e.preventDefault();
+
+    checkDefault.setFieldValue("Re_Id", Re_Id);
+    checkDefault.setFieldValue("is_Default", is_Default);
+    showDefaultModal();
+  };
+
+  const defaultSubmit = (data) => {
+    userService.defaultReceiver(data.Re_Id).then((res) => {
+      if (res.errorCode === 0) {
+        toast.success("Change Successful");
+        const newInfo = {
+          ...userInfo,
+          receiver: res.data.receiver,
+        };
+        dispatch(
+          updateInfo({
+            userInfo: newInfo,
+          })
+        );
+        closeDefaultModal();
+      } else {
+        toast.error(res.message);
       }
     });
   };
@@ -252,7 +301,7 @@ const User = () => {
 
   const orderFormik = useFormik({
     initialValues: {
-      ORD_Id: 0,
+      ORD_Re_Re_Re_Id: 0,
       ORD_Code: "",
       ORD_Name: "",
       ORD_Address: "",
@@ -295,7 +344,7 @@ const User = () => {
                     <Card className="profile-tab-nav rounded-5 border-0">
                       <Card.Img
                         src={userInfo.bgimg}
-                        className=" img-fluid rounded-4"
+                        className=" img-fluRe_Re_Re_Id rounded-4"
                       />
                       <Card.ImgOverlay>
                         <div className="img-circle text-center mb-3">
@@ -393,6 +442,8 @@ const User = () => {
                           </Container>
                         </Tab.Pane>
 
+                        {/* -------------------------Change Password------------------------------------------- */}
+
                         <Tab.Pane
                           eventKey="change-password"
                           className="px-lg-5 pt-lg-2 px-sm-2"
@@ -417,7 +468,7 @@ const User = () => {
                                   type="password"
                                   placeholder="Enter password"
                                   {...formik.getFieldProps("password")}
-                                  isValid={
+                                  isvalid={
                                     formik.touched.password &&
                                     !formik.errors.password
                                   }
@@ -447,7 +498,7 @@ const User = () => {
                                   type="password"
                                   placeholder="Enter new password"
                                   {...formik.getFieldProps("newPassword")}
-                                  isValid={
+                                  isvalid={
                                     formik.touched.newPassword &&
                                     !formik.errors.newPassword
                                   }
@@ -456,7 +507,7 @@ const User = () => {
                                     formik.errors.newPassword
                                   }
                                 />
-                                <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
                                   {formik.errors.newPassword}
                                 </Form.Control.Feedback>
                               </Col>
@@ -477,7 +528,7 @@ const User = () => {
                                   type="password"
                                   placeholder="Enter password"
                                   {...formik.getFieldProps("confirmPassword")}
-                                  isValid={
+                                  isvalid={
                                     formik.touched.confirmPassword &&
                                     !formik.errors.confirmPassword
                                   }
@@ -486,7 +537,7 @@ const User = () => {
                                     formik.errors.confirmPassword
                                   }
                                 />
-                                <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
                                   {formik.errors.confirmPassword}
                                 </Form.Control.Feedback>
                               </Col>
@@ -527,7 +578,7 @@ const User = () => {
                                   ref={nameRef}
                                   type="text"
                                   {...changeInfo.getFieldProps("name")}
-                                  isValid={
+                                  isvalid={
                                     changeInfo.touched.name &&
                                     !changeInfo.errors.name
                                   }
@@ -536,7 +587,7 @@ const User = () => {
                                     changeInfo.errors.name
                                   }
                                 />
-                                <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
                                   {changeInfo.errors.name}
                                 </Form.Control.Feedback>
                               </Col>
@@ -556,7 +607,7 @@ const User = () => {
                                   ref={emailRef}
                                   type="email"
                                   {...changeInfo.getFieldProps("email")}
-                                  isValid={
+                                  isvalid={
                                     changeInfo.touched.email &&
                                     !changeInfo.errors.email
                                   }
@@ -565,7 +616,7 @@ const User = () => {
                                     changeInfo.errors.email
                                   }
                                 />
-                                <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
                                   {changeInfo.errors.email}
                                 </Form.Control.Feedback>
                               </Col>
@@ -599,51 +650,155 @@ const User = () => {
                               {userInfo.receiver.length !== 0 ? (
                                 <>
                                   {userInfo.receiver.map((list) => (
-                                    <tr key={list.id}>
-                                      <td className="py-3">
-                                        {list.is_Default}
-                                      </td>
-                                      <td className="border-bottom border-dark py-3">
-                                        <Row sm={1}>
-                                          <Col>
-                                            {list.name} | {list.phone}
-                                          </Col>
-                                          <Col className="text-muted fs-6">
-                                            {list.address}
-                                          </Col>
-                                          {list.is_Default ? (
-                                            <Col sm={12} className=" fs-6 pt-2">
-                                              <span className="text-danger border border-2 border-danger px-2">
-                                                Default
-                                              </span>
-                                            </Col>
-                                          ) : (
-                                            <></>
-                                          )}
-                                        </Row>
-                                      </td>
+                                    <tr key={list.Re_Id}>
+                                      {list.is_Default ? (
+                                        <>
+                                          <td className="py-3">
+                                            {/* <Form.Check
+                                              type="switch"
+                                              value={list.is_Default}
+                                              checked={list.is_Default}
+                                              // as={Button}
 
-                                      <td
-                                        className=" py-3"
-                                        style={{ width: "50px" }}
-                                      >
-                                        <a
-                                          href="/#"
-                                          onClick={(e) =>
-                                            showEditModal(e, list.id)
-                                          }
-                                        >
-                                          <i className="bi-pencil-square text-primary" />
-                                        </a>
-                                        <a
-                                          href="/#"
-                                          onClick={(e) =>
-                                            handleDelete(e, list.id)
-                                          }
-                                        >
-                                          <i className="bi-trash text-danger" />
-                                        </a>
-                                      </td>
+                                              onChange={(e) => {
+                                                // defaultReceiver(
+                                                //   e,
+                                                //   list.Re_Id,
+                                                //   1
+                                                // );
+                                              }}
+                                            /> */}
+
+                                            <Form
+                                              className="bg-primary"
+                                              as={Button}
+                                              onClick={(e) => {
+                                                defaultReceiver(
+                                                  e,
+                                                  list.Re_Id,
+                                                  1
+                                                );
+                                              }}
+                                            />
+                                          </td>
+
+                                          <td className="border-bottom border-dark py-3">
+                                            <Row sm={1}>
+                                              <Col>
+                                                {list.name} | {list.phone}
+                                              </Col>
+                                              <Col className="text-muted fs-6">
+                                                {list.address}
+                                              </Col>
+
+                                              <Col
+                                                sm={12}
+                                                className=" fs-6 pt-2"
+                                              >
+                                                <span className="text-danger border border-2 border-danger px-2">
+                                                  Default
+                                                </span>
+                                              </Col>
+                                            </Row>
+                                          </td>
+
+                                          <td
+                                            className=" py-3"
+                                            style={{ width: "50px" }}
+                                          >
+                                            <a
+                                              href="/#"
+                                              onClick={(e) =>
+                                                showEditModal(e, list.Re_Id)
+                                              }
+                                            >
+                                              <i className="bi-pencil-square text-primary" />
+                                            </a>
+                                            <a
+                                              href="/#"
+                                              onClick={(e) =>
+                                                handleDelete(e, list.Re_Id)
+                                              }
+                                            >
+                                              <i className="bi-trash text-danger" />
+                                            </a>
+                                          </td>
+                                        </>
+                                      ) : (
+                                        <></>
+                                      )}
+                                    </tr>
+                                  ))}
+
+                                  {userInfo.receiver.map((list) => (
+                                    <tr key={list.Re_Id}>
+                                      {!list.is_Default ? (
+                                        <>
+                                          <td className="py-3">
+                                            {/* <Form.Check
+                                              type="switch"
+                                              value={list.is_Default}
+                                              checked={list.is_Default}
+                                              // className="bg-secondary"
+                                              // as={Button}
+                                              onChange={(e) => {
+                                                defaultReceiver(
+                                                  e,
+                                                  list.Re_Id,
+                                                  1
+                                                );
+                                              }}
+                                            /> */}
+
+                                            <Form
+                                              className="bg-secondary"
+                                              as={Button}
+                                              onClick={(e) => {
+                                                defaultReceiver(
+                                                  e,
+                                                  list.Re_Id,
+                                                  list.is_Default
+                                                );
+                                              }}
+                                            />
+                                          </td>
+
+                                          <td className="border-bottom border-dark py-3">
+                                            <Row sm={1}>
+                                              <Col>
+                                                {list.name} | {list.phone}
+                                              </Col>
+                                              <Col className="text-muted fs-6">
+                                                {list.address}
+                                              </Col>
+                                            </Row>
+                                          </td>
+
+                                          <td
+                                            className=" py-3"
+                                            style={{ width: "50px" }}
+                                          >
+                                            <a
+                                              href="/#"
+                                              onClick={(e) =>
+                                                showEditModal(e, list.Re_Id)
+                                              }
+                                            >
+                                              <i className="bi-pencil-square text-primary" />
+                                            </a>
+                                            <a
+                                              href="/#"
+                                              onClick={(e) =>
+                                                handleDelete(e, list.Re_Id)
+                                              }
+                                            >
+                                              <i className="bi-trash text-danger" />
+                                            </a>
+                                          </td>
+                                        </>
+                                      ) : (
+                                        <></>
+                                      )}
                                     </tr>
                                   ))}
                                 </>
@@ -684,13 +839,14 @@ const User = () => {
                             className="bg-light bg-icon text-center "
                           >
                             <thead>
-                              <tr className="bg-primary align-middle">
-                                <th>Id</th>
+                              <tr className="bg-primary align-mRe_Re_Re_Iddle">
+                                <th>Order Id</th>
                                 <th>Receiver</th>
                                 <th>Date Order</th>
                                 <th>Order Info</th>
                               </tr>
                             </thead>
+
                             <tbody>
                               {userInfo.order.length !== 0 ? (
                                 <>
@@ -722,23 +878,11 @@ const User = () => {
                                 </>
                               ) : (
                                 <tr className="text-center ">
-                                  <td colSpan={3} className="py-3">
+                                  <td colSpan={4} className="py-3">
                                     <h1>You don't have any order!</h1>
                                   </td>
                                 </tr>
                               )}
-
-                              {/* <tr className="text-center ">
-                                <td colSpan={3} className="py-3">
-                                  <Button
-                                    variant="primary"
-                                    type="button"
-                                    onClick={() => showEditModal(null, 0)}
-                                  >
-                                    <i className="bi-plus-lg" /> Add More
-                                  </Button>
-                                </td>
-                              </tr> */}
                             </tbody>
                           </Table>
                         </Tab.Pane>
@@ -750,16 +894,47 @@ const User = () => {
             </CardGroup>
           </Container>
 
+          {/* -------------------------Modal Default------------------------------------------- */}
+          <Modal show={defaultModal} onHide={closeDefaultModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Default Receiver</Modal.Title>
+            </Modal.Header>
+            {checkDefault.values.is_Default ? (
+              <Modal.Body>
+                <h4 className="text-center">
+                  Do you want to remove the default?
+                </h4>
+              </Modal.Body>
+            ) : (
+              <Modal.Body>
+                <h4 className="text-center">
+                  Do you want this receiver to be the default?
+                </h4>
+              </Modal.Body>
+            )}
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={closeDefaultModal}>
+                No
+              </Button>
+
+              <Button variant="primary" onClick={checkDefault.handleSubmit}>
+                Yes
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
           {/* -------------------------Modal Receiver (get add update delete)------------------------------------------- */}
-          <Modal show={modalShow} onHide={handleModalClose}>
+          <Modal show={receiverModal} onHide={closeReceiverModal}>
             <Modal.Header closeButton>
               <Modal.Title>
                 Receiver
                 <small className="text-muted">
-                  {checkReceiver.values.id === 0 ? " new" : " edit"}
+                  {checkReceiver.values.Re_Id === 0 ? " new" : " edit"}
                 </small>
               </Modal.Title>
             </Modal.Header>
+
             <Modal.Body>
               <Form>
                 <Input
@@ -790,10 +965,23 @@ const User = () => {
                     checkReceiver.errors.address
                   }
                 />
+
+                <Form.Check
+                  type="switch"
+                  value={checkReceiver.values.is_Default}
+                  checked={checkReceiver.values.is_Default}
+                  onChange={() =>
+                    checkReceiver.setFieldValue(
+                      "is_Default",
+                      checkReceiver.values.is_Default ? 0 : 1
+                    )
+                  }
+                />
               </Form>
             </Modal.Body>
+
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleModalClose}>
+              <Button variant="secondary" onClick={closeReceiverModal}>
                 Close
               </Button>
 
@@ -810,6 +998,7 @@ const User = () => {
           </Modal>
 
           {/* -------------------------Modal Order Info------------------------------------------------- */}
+
           <Modal
             dialogClassName="modal-80w"
             show={orderInfoModal}

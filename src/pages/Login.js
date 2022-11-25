@@ -51,7 +51,6 @@ const Login = (e) => {
 
   const handleBack = (e) => {
     e.preventDefault();
-    console.log("handle Click");
     navigate("/");
   };
 
