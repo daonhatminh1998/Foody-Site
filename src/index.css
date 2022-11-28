@@ -711,7 +711,3 @@ div {
   height: 100px;
   width: 100px;
 }
-
-.modal {
-  overflow: auto !important;
-}

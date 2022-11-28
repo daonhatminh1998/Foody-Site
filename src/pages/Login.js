@@ -9,6 +9,7 @@ import { login } from "../store/reducers/auth";
 
 import Input from "../components/Input";
 import CustomButton from "../components/CustomButton";
+import { useCart } from "../store/Cart";
 
 const Login = (e) => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const Login = (e) => {
   const usernameRef = React.useRef();
   const passwordRef = React.useRef();
   const [isWaiting, setIsWaiting] = useState(false);
+  const { cartItems, setCartItems } = useCart();
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ const Login = (e) => {
     const password = passwordRef.current.value;
 
     setIsWaiting(true);
-    userService.login(username, password).then((res) => {
+    userService.login(username, password, cartItems).then((res) => {
       setIsWaiting(false);
       if (res.errorCode === 0) {
         dispatch(
@@ -33,6 +35,14 @@ const Login = (e) => {
             token: res.data.api_token,
             userInfo: res.data,
           })
+        );
+        console.log(res.data);
+
+        setCartItems(
+          res.data.cart.cart_detail.map((item) => ({
+            id: item.ProDe_Id,
+            quantity: item.CartDe_Quantity,
+          }))
         );
 
         navigate("/");

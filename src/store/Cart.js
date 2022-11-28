@@ -193,31 +193,20 @@ export const CartProvider = ({ children }) => {
   const dispatch = useDispatch();
 
   if (isLoggedIn) {
-    // if (cartItems.length !== 0) {
-    //   const cart = { cartItem: cartItems };
-    //   setInterval(function () {
-    //     cartService.updateCart(cart).then((res) => {
-    //       console.log(res);
-    //     });
-    //   }, 6000);
-    // } else {
-    //   setInterval(function () {
-    //     cartService.listCart(cartItems).then((res) => {
-    //       if (res.errorCode === 0) {
-    //         setCartItems(
-    //           res.data.cart_detail.map((item) => ({
-    //             id: item.ProDe_Id,
-    //             quantity: item.CartDe_Quantity,
-    //             select: 0,
-    //           }))
-    //         );
-    //         console.log("else");
-    //       }
-    //     });
-    //   }, 6000);
-    // }
+    if (cartItems.length !== 0) {
+      const cart = { cartItem: cartItems };
+      setInterval(function () {
+        cartService.updateCart(cart).then((res) => {
+          setCartItems(
+            res.data.cart_detail.map((item) => ({
+              id: item.ProDe_Id,
+              quantity: item.CartDe_Quantity,
+            }))
+          );
+        });
+      }, 6000);
+    }
   }
-  // console.log(!cartItems.length);
 
   function deleteItem(id) {
     if (isLoggedIn) {
@@ -271,6 +260,7 @@ export const CartProvider = ({ children }) => {
         deleteAll,
 
         cartItems,
+        setCartItems,
         cartQuantity,
         removeItem,
         clearCart,
