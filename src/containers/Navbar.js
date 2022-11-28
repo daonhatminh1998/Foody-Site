@@ -14,7 +14,7 @@ import { useSelector } from "react-redux/es/exports";
 import { useDispatch } from "react-redux";
 
 const Navbars = () => {
-  const { openCart, totalItem } = useCart();
+  const { openCart, cartQuantity } = useCart();
   const [expanded, setExpanded] = useState(false);
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -128,6 +128,7 @@ const Navbars = () => {
                   size="1x"
                   color="#3cb815"
                 />
+
                 <div
                   className="rounded-circle d-flex justify-content-center bg-danger align-items-center"
                   style={{
@@ -140,7 +141,7 @@ const Navbars = () => {
                     transform: "translate(25%,25%)",
                   }}
                 >
-                  {totalItem}
+                  {cartQuantity}
                 </div>
               </Button>
             </Col>

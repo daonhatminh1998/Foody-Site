@@ -3,32 +3,29 @@ import store from "../store";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
-  baseUrl: "http://localhost/foody/member/",
+  baseUrl: "http://localhost/foody/",
   // baseUrl: "https://myfoody290798.herokuapp.com/member/",
-  login: "login",
-  changePassword: "changePassword",
-  changeInfor: "changeInfor",
+  login: "member/login",
+  changePassword: "member/changePassword",
+  changeInfor: "member/changeInfor",
 
-  selectItem: "selectItem",
-  addQuantity: "addQuantity",
-  removeQuantity: "removeQuantity",
-  deleteItem: "deleteItem",
-  deleteAll: "deleteAll",
+  carts: "member/carts",
 
-  receiver: "receiver",
-  default: "default",
-  chosen: "chosen",
-  reset: "reset",
-  newReceiver: "newReceiver",
-  updateReceiver: "updateReceiver",
-  deleteReceiver: "deleteReceiver",
+  receiver: "member/receiver",
+  default: "member/default",
+  chosen: "member/chosen",
+  reset: "member/reset",
+  newReceiver: "member/newReceiver",
+  updateReceiver: "member/updateReceiver",
+  deleteReceiver: "member/deleteReceiver",
 
   order: "order",
 
-  products: "products",
-  productDetail: "productDetail",
-  orders: "orders",
-  orderDetail: "orderDetail",
+  products: "api/products",
+  productDetail: "api/productDetail",
+
+  orderCus: "api/orderCus",
+  orderCusDetail: "api/orderCusDetail",
 };
 
 const instance = axios.create({

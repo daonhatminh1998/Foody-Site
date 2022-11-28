@@ -28,8 +28,6 @@ const Login = (e) => {
     userService.login(username, password).then((res) => {
       setIsWaiting(false);
       if (res.errorCode === 0) {
-        setMessage("Ok");
-
         dispatch(
           login({
             token: res.data.api_token,

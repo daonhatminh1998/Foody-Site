@@ -2,14 +2,13 @@ import { Button, Col, Row, Image, Form } from "react-bootstrap";
 import { useCart } from "../../store/Cart";
 import formatCurrency from "../../utilities/formatCurrency";
 
-export function CartItem({ id, quantity, select, price }) {
+export function CartItem({ id, quantity, select }) {
   const {
     productDetail,
-
     selectItem,
-    addItem,
-    removeItem,
-    deleteItem,
+    increaseCartQuantity,
+    decreaseCartQuantity,
+    removeFromCart,
   } = useCart();
 
   const item = productDetail.find((i) => i.ProDe_Id === id);
@@ -40,23 +39,29 @@ export function CartItem({ id, quantity, select, price }) {
             <Col className="px-2 ">
               <Col>{item.Pro_Name}</Col>
               <Col>x {quantity}</Col>
-              <Col className="fs-6">{formatCurrency(price)}</Col>
+              <Col className="fs-6">{formatCurrency(item.Pro_Price)}</Col>
             </Col>
 
             <Col className="align-self-center p-0">
               <Row sm={3} className="gx-1">
                 <Col>
-                  <Button variant="warning" onClick={() => removeItem(id)}>
+                  <Button
+                    variant="warning"
+                    onClick={() => decreaseCartQuantity(id)}
+                  >
                     -
                   </Button>
                 </Col>
                 <Col>
-                  <Button variant="primary" onClick={() => addItem(id)}>
+                  <Button
+                    variant="primary"
+                    onClick={() => increaseCartQuantity(id)}
+                  >
                     +
                   </Button>
                 </Col>
                 <Col>
-                  <Button variant="danger" onClick={() => deleteItem(id)}>
+                  <Button variant="danger" onClick={() => removeFromCart(id)}>
                     &times;
                   </Button>
                 </Col>

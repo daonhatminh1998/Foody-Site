@@ -3,9 +3,14 @@ import formatCurrency from "../../utilities/formatCurrency";
 import { Link } from "react-router-dom";
 import { useCart } from "../../store/Cart";
 const Product = ({ product }) => {
-  const { getItem, addItem, removeItem, deleteItem } = useCart();
+  const {
+    getItemQuantity,
+    increaseCartQuantity,
+    decreaseCartQuantity,
+    removeFromCart,
+  } = useCart();
 
-  const itemQuantity = getItem(product.ProDe_Id);
+  const itemQuantity = getItemQuantity(product.ProDe_Id);
 
   return (
     <>
@@ -45,7 +50,7 @@ const Product = ({ product }) => {
             {itemQuantity === 0 ? (
               <Button
                 className="w-100"
-                onClick={() => addItem(product.ProDe_Id)}
+                onClick={() => increaseCartQuantity(product.ProDe_Id)}
               >
                 + Add to Cart
               </Button>
@@ -58,20 +63,26 @@ const Product = ({ product }) => {
                   className="d-flex align-items-center justify-content-center"
                   style={{ gap: "1rem" }}
                 >
-                  <Button onClick={() => removeItem(product.ProDe_Id)}>
+                  <Button
+                    onClick={() => decreaseCartQuantity(product.ProDe_Id)}
+                  >
                     -
                   </Button>
                   <div>
                     <span className="fs-3">{itemQuantity} </span>
                     in cart
                   </div>
-                  <Button onClick={() => addItem(product.ProDe_Id)}>+</Button>
+                  <Button
+                    onClick={() => increaseCartQuantity(product.ProDe_Id)}
+                  >
+                    +
+                  </Button>
                 </div>
                 <Button
                   variant="danger"
                   size="small"
                   style={{ borderRadius: "10px" }}
-                  onClick={() => deleteItem(product.ProDe_Id)}
+                  onClick={() => removeFromCart(product.ProDe_Id)}
                 >
                   Remove
                 </Button>

@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 
 import { logout, updateInfo } from ".././store/reducers/auth";
 import userService from "../services/userService";
-import ordersServices from "../services/ordersServices";
+import orderCusServices from "../services/orderCusServices";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -324,7 +324,7 @@ const User = () => {
   const showOrderInfoModal = (e, ORD_Id) => {
     if (e) e.preventDefault();
 
-    ordersServices.get(ORD_Id).then((res) => {
+    orderCusServices.get(ORD_Id).then((res) => {
       if (res.errorCode === 0) {
         orderFormik.setValues(res.data);
         showOrderInfo();

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
@@ -6,8 +7,10 @@ import { updateInfo } from ".././store/reducers/auth";
 
 import userService from "../services/userService";
 import ProductDetailService from "../services/productDetailService";
+import cartService from "../services/cartServices";
 
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 const CartStateContext = createContext();
 export const useCart = () => useContext(CartStateContext);
@@ -43,7 +46,6 @@ export const CartProvider = ({ children }) => {
         }
       }
 
-      // console.log(range);
       //mũi tên
       if (res.pagingInfo.totalPages > 0) {
         rangeWithDots = [
@@ -102,96 +104,120 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, pageLength]);
 
-  //---------------------BackEnd (New)------------------------------------------
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const userInfo = useSelector((state) => state.auth.userInfo);
-  const dispatch = useDispatch();
+  //---------------------FrontEnd------------------------------------------
 
-  var cartItem = [];
-  if (isLoggedIn) {
-    if (userInfo.cart.cart_detail.length) {
-      cartItem = userInfo.cart.cart_detail.map((item) => ({
-        id: item.ProDe_Id,
-        quantity: item.CartDe_Quantity,
-        select: item.is_Selected,
-        price: item.CartDe_Price,
-      }));
-    }
-  }
+  const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
 
-  const totalItem = cartItem.reduce(
+  const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
   );
 
-  function getItem(id) {
-    return cartItem.find((item) => item.id === id)?.quantity || 0;
+  function getItemQuantity(id) {
+    return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
 
   function selectItem(id, select) {
-    if (isLoggedIn) {
-      userService.selectItem(id, select).then((res) => {
-        if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            cart: res.data.cart,
-          };
-
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
+    setCartItems((currItems) => {
+      return currItems.map((item) => {
+        if (item.id === id && item.select !== select) {
+          return { ...item, select: select };
+        } else {
+          return item;
         }
       });
-    } else {
-      console.log("please Login");
-    }
+    });
   }
 
-  function addItem(id) {
-    if (isLoggedIn) {
-      userService.addQuantity(id).then((res) => {
-        if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            cart: res.data.cart,
-          };
-
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-        }
-      });
-    } else {
-      console.log("please Login");
-    }
+  function increaseCartQuantity(id) {
+    setCartItems((currItems) => {
+      if (currItems.find((item) => item.id === id) == null) {
+        return [...currItems, { id, quantity: 1, select: 0 }];
+      } else {
+        return currItems.map((item) => {
+          if (item.id === id) {
+            return { ...item, quantity: item.quantity + 1 };
+          } else {
+            return item;
+          }
+        });
+      }
+    });
   }
 
-  function removeItem(id) {
-    if (isLoggedIn) {
-      userService.removeQuantity(id).then((res) => {
-        if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            cart: res.data.cart,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-        }
-      });
-    } else {
-      console.log("please Login");
-    }
+  function decreaseCartQuantity(id) {
+    setCartItems((currItems) => {
+      if (currItems.find((item) => item.id === id)?.quantity === 1) {
+        return currItems.filter((item) => item.id !== id);
+      } else {
+        return currItems.map((item) => {
+          if (item.id === id) {
+            return { ...item, quantity: item.quantity - 1 };
+          } else {
+            return item;
+          }
+        });
+      }
+    });
   }
+
+  function removeFromCart(id) {
+    setCartItems((currItems) => {
+      return currItems.filter((item) => item.id !== id);
+    });
+  }
+
+  function removeItem() {
+    const removeItem = [];
+    cartItems.map((item) =>
+      !item.select
+        ? removeItem.push({
+            id: item.id,
+            quantity: item.quantity,
+            select: item.select,
+          })
+        : 0
+    );
+    return setCartItems(removeItem);
+  }
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
+  //---------------------BackEnd------------------------------------------
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const dispatch = useDispatch();
+
+  if (isLoggedIn) {
+    // if (cartItems.length !== 0) {
+    //   const cart = { cartItem: cartItems };
+    //   setInterval(function () {
+    //     cartService.updateCart(cart).then((res) => {
+    //       console.log(res);
+    //     });
+    //   }, 6000);
+    // } else {
+    //   setInterval(function () {
+    //     cartService.listCart(cartItems).then((res) => {
+    //       if (res.errorCode === 0) {
+    //         setCartItems(
+    //           res.data.cart_detail.map((item) => ({
+    //             id: item.ProDe_Id,
+    //             quantity: item.CartDe_Quantity,
+    //             select: 0,
+    //           }))
+    //         );
+    //         console.log("else");
+    //       }
+    //     });
+    //   }, 6000);
+    // }
+  }
+  // console.log(!cartItems.length);
 
   function deleteItem(id) {
     if (isLoggedIn) {
@@ -241,14 +267,19 @@ export const CartProvider = ({ children }) => {
         openCart,
         closeCart,
 
-        getItem,
-        selectItem,
-        addItem,
-        removeItem,
         deleteItem,
         deleteAll,
-        cartItem,
-        totalItem,
+
+        cartItems,
+        cartQuantity,
+        removeItem,
+        clearCart,
+
+        getItemQuantity,
+        selectItem,
+        increaseCartQuantity,
+        decreaseCartQuantity,
+        removeFromCart,
       }}
     >
       {children}
