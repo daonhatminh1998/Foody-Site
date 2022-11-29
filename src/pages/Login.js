@@ -5,13 +5,14 @@ import CardHeader from "react-bootstrap/esm/CardHeader";
 import { Card, Col, Container, Form, Row } from "react-bootstrap";
 
 import userService from "../services/userService";
+import cartService from "../services/cartServices";
 import { login } from "../store/reducers/auth";
 
 import Input from "../components/Input";
 import CustomButton from "../components/CustomButton";
 import { useCart } from "../store/Cart";
 
-const Login = (e) => {
+const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -29,24 +30,26 @@ const Login = (e) => {
     setIsWaiting(true);
     userService.login(username, password, cartItems).then((res) => {
       setIsWaiting(false);
+      console.log(res);
       if (res.errorCode === 0) {
-        dispatch(
-          login({
-            token: res.data.api_token,
-            userInfo: res.data,
-          })
-        );
-        console.log(res.data);
-
-        setCartItems(
-          res.data.cart.cart_detail.map((item) => ({
-            id: item.ProDe_Id,
-            quantity: item.CartDe_Quantity,
-          }))
-        );
-
-        navigate("/");
-        window.scrollTo(0, 0);
+        // dispatch(
+        //   login({
+        //     token: res.data.api_token,
+        //     userInfo: res.data,
+        //   })
+        // );
+        // cartService.listCart().then((res) => {
+        //   if (res.errorCode === 0) {
+        //     setCartItems(
+        //       res.data.cart_detail.map((item) => ({
+        //         id: item.ProDe_Id,
+        //         quantity: item.CartDe_Quantity,
+        //       }))
+        //     );
+        //   }
+        // });
+        // navigate("/");
+        // window.scrollTo(0, 0);
       } else {
         setMessage(res.message);
       }

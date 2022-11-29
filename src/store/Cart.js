@@ -195,16 +195,20 @@ export const CartProvider = ({ children }) => {
   if (isLoggedIn) {
     if (cartItems.length !== 0) {
       const cart = { cartItem: cartItems };
-      setInterval(function () {
+      const id = setInterval(function () {
         cartService.updateCart(cart).then((res) => {
-          setCartItems(
-            res.data.cart_detail.map((item) => ({
-              id: item.ProDe_Id,
-              quantity: item.CartDe_Quantity,
-            }))
-          );
+          console.log(res);
+          // setCartItems(???
+          //   res.data.cart_detail.map((item) => ({
+          //     id: item.ProDe_Id,
+          //     quantity: item.CartDe_Quantity,
+          //   }))
+          // );
         });
-      }, 6000);
+      }, 5000);
+      // if (cartItems.length === 0) {
+      //   clearInterval(id);
+      // }
     }
   }
 
