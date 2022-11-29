@@ -7,13 +7,14 @@ import { useCart } from "../store/Cart";
 import formatCurrency from "../utilities/formatCurrency";
 
 const DetailPages = () => {
-  const { id } = useParams();
+  const { ProDe_Id } = useParams();
   const { productDetail, getItem, addItem, removeItem, deleteItem } = useCart();
 
-  const quantity = getItem(Number(id));
+  const quantity = getItem(Number(ProDe_Id));
+  console.log(ProDe_Id);
 
   return productDetail
-    .filter((index) => index.ProDe_Id === Number(id))
+    .filter((index) => index.ProDe_Id === Number(ProDe_Id))
     .map((index) => (
       <div key={index} className="bg-light">
         <OtherHeader label="OurProducts" id={index.Pro_Name} />

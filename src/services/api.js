@@ -10,6 +10,9 @@ const url = {
   changeInfor: "member/changeInfor",
 
   carts: "member/carts",
+  addQuantity: "member/addQuantity",
+  deleteItem: "member/deleteItem",
+  deleteAll: "member/deleteAll",
 
   receiver: "member/receiver",
   default: "member/default",
@@ -19,7 +22,7 @@ const url = {
   updateReceiver: "member/updateReceiver",
   deleteReceiver: "member/deleteReceiver",
 
-  order: "order",
+  order: "member/sorder",
 
   products: "api/products",
   productDetail: "api/productDetail",

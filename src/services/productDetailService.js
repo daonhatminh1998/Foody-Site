@@ -24,7 +24,7 @@ const getPaging = (p, r, admin, type, s, from, to, q) => {
   return api.get(`${api.url.productDetail}/get_paging?${queryString}`);
 };
 
-const get = (id) => api.get(`${api.url.productDetail}/${id}`);
+const get = (ProDe_Id) => api.get(`${api.url.productDetail}/${ProDe_Id}`);
 // const add = (data) => api.post(api.url.productDetail, data);
 const add = (data) => {
   const formData = new FormData();

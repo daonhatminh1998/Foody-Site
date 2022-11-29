@@ -2,7 +2,7 @@ import { Button, Col, Row, Image, Form } from "react-bootstrap";
 import { useCart } from "../../store/Cart";
 import formatCurrency from "../../utilities/formatCurrency";
 
-export function CartItem({ id, quantity, select }) {
+export function CartItem({ ProDe_Id, quantity, select }) {
   const {
     productDetail,
     selectItem,
@@ -11,7 +11,7 @@ export function CartItem({ id, quantity, select }) {
     removeFromCart,
   } = useCart();
 
-  const item = productDetail.find((i) => i.ProDe_Id === id);
+  const item = productDetail.find((i) => i.ProDe_Id === ProDe_Id);
   if (!item) return null;
 
   return (
@@ -25,7 +25,7 @@ export function CartItem({ id, quantity, select }) {
             type="checkbox"
             checked={select}
             onChange={() => {
-              selectItem(id, select ? 0 : 1);
+              selectItem(ProDe_Id, select ? 0 : 1);
             }}
           />
         </Col>
@@ -47,7 +47,7 @@ export function CartItem({ id, quantity, select }) {
                 <Col>
                   <Button
                     variant="warning"
-                    onClick={() => decreaseCartQuantity(id)}
+                    onClick={() => decreaseCartQuantity(ProDe_Id)}
                   >
                     -
                   </Button>
@@ -55,13 +55,16 @@ export function CartItem({ id, quantity, select }) {
                 <Col>
                   <Button
                     variant="primary"
-                    onClick={() => increaseCartQuantity(id)}
+                    onClick={() => increaseCartQuantity(ProDe_Id)}
                   >
                     +
                   </Button>
                 </Col>
                 <Col>
-                  <Button variant="danger" onClick={() => removeFromCart(id)}>
+                  <Button
+                    variant="danger"
+                    onClick={() => removeFromCart(ProDe_Id)}
+                  >
                     &times;
                   </Button>
                 </Col>

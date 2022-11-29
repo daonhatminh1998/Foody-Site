@@ -110,19 +110,23 @@ export const CartProvider = ({ children }) => {
 
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
 
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const userInfo = useSelector((state) => state.auth.userInfo);
+  const dispatch = useDispatch();
+
   const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
   );
 
-  function getItemQuantity(id) {
-    return cartItems.find((item) => item.id === id)?.quantity || 0;
+  function getItemQuantity(ProDe_Id) {
+    return cartItems.find((item) => item.ProDe_Id === ProDe_Id)?.quantity || 0;
   }
 
-  function selectItem(id, select) {
+  function selectItem(ProDe_Id, select) {
     setCartItems((currItems) => {
       return currItems.map((item) => {
-        if (item.id === id && item.select !== select) {
+        if (item.ProDe_Id === ProDe_Id && item.select !== select) {
           return { ...item, select: select };
         } else {
           return item;
@@ -131,13 +135,16 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function increaseCartQuantity(id) {
+  function increaseCartQuantity(ProDe_Id) {
     setCartItems((currItems) => {
-      if (currItems.find((item) => item.id === id) == null) {
-        return [...currItems, { id, quantity: 1, select: 0 }];
+      if (currItems.find((item) => item.ProDe_Id === ProDe_Id) == null) {
+        if (isLoggedIn) {
+          cartService.addQuantity(ProDe_Id);
+        }
+        return [...currItems, { ProDe_Id, quantity: 1, select: 0 }];
       } else {
         return currItems.map((item) => {
-          if (item.id === id) {
+          if (item.ProDe_Id === ProDe_Id) {
             return { ...item, quantity: item.quantity + 1 };
           } else {
             return item;
@@ -147,13 +154,15 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function decreaseCartQuantity(id) {
+  function decreaseCartQuantity(ProDe_Id) {
     setCartItems((currItems) => {
-      if (currItems.find((item) => item.id === id)?.quantity === 1) {
-        return currItems.filter((item) => item.id !== id);
+      if (
+        currItems.find((item) => item.ProDe_Id === ProDe_Id)?.quantity === 1
+      ) {
+        return currItems;
       } else {
         return currItems.map((item) => {
-          if (item.id === id) {
+          if (item.ProDe_Id === ProDe_Id) {
             return { ...item, quantity: item.quantity - 1 };
           } else {
             return item;
@@ -163,9 +172,12 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function removeFromCart(id) {
+  function removeFromCart(ProDe_Id) {
     setCartItems((currItems) => {
-      return currItems.filter((item) => item.id !== id);
+      if (isLoggedIn) {
+        cartService.deleteItem(ProDe_Id);
+      }
+      return currItems.filter((item) => item.ProDe_Id !== ProDe_Id);
     });
   }
 
@@ -174,7 +186,7 @@ export const CartProvider = ({ children }) => {
     cartItems.map((item) =>
       !item.select
         ? removeItem.push({
-            id: item.id,
+            ProDe_Id: item.ProDe_Id,
             quantity: item.quantity,
             select: item.select,
           })
@@ -184,73 +196,27 @@ export const CartProvider = ({ children }) => {
   }
 
   const clearCart = () => {
+    if (isLoggedIn) {
+      cartService.deleteAll();
+    }
     setCartItems([]);
   };
 
   //---------------------BackEnd------------------------------------------
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const userInfo = useSelector((state) => state.auth.userInfo);
-  const dispatch = useDispatch();
 
-  if (isLoggedIn) {
-    if (cartItems.length !== 0) {
-      const cart = { cartItem: cartItems };
-      const id = setInterval(function () {
-        cartService.updateCart(cart).then((res) => {
-          console.log(res);
-          // setCartItems(???
-          //   res.data.cart_detail.map((item) => ({
-          //     id: item.ProDe_Id,
-          //     quantity: item.CartDe_Quantity,
-          //   }))
-          // );
-        });
-      }, 5000);
-      // if (cartItems.length === 0) {
-      //   clearInterval(id);
-      // }
-    }
-  }
-
-  function deleteItem(id) {
-    if (isLoggedIn) {
-      userService.deleteItem(id).then((res) => {
-        if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            cart: res.data.cart,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-        }
-      });
-    } else {
-      console.log("please Login");
-    }
-  }
-
-  function deleteAll() {
-    if (isLoggedIn) {
-      userService.deleteAll().then((res) => {
-        if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            cart: res.data[1],
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-        }
-      });
-    } else {
-      console.log("please Login");
-    }
-  }
+  // if (isLoggedIn) {
+  //   if (cartItems.length !== 0) {
+  //     const cart = { cartItem: cartItems };
+  //     const id = setInterval(function () {
+  //       cartService.updateCart(cart).then((res) => {
+  //         console.log(res);
+  //       });
+  //     }, 10000);
+  //     if (cartItems.length === 0) {
+  //       clearInterval(id);
+  //     }
+  //   }
+  // }
 
   return (
     <CartStateContext.Provider
@@ -260,15 +226,13 @@ export const CartProvider = ({ children }) => {
         openCart,
         closeCart,
 
-        deleteItem,
-        deleteAll,
-
         cartItems,
         setCartItems,
         cartQuantity,
         removeItem,
         clearCart,
 
+        getItem,
         getItemQuantity,
         selectItem,
         increaseCartQuantity,
