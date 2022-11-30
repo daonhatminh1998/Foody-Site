@@ -1,7 +1,7 @@
 import { Button, Card, Carousel, Col, Container, Row } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 
-import OtherHeader from "../components/OtherHeader";
+import OtherHeader from "../components/header/OtherHeader";
 
 import { useCart } from "../store/Cart";
 import formatCurrency from "../utilities/formatCurrency";

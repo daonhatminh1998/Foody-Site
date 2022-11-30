@@ -15,188 +15,44 @@ import { CartItem } from "./CartItem";
 import { useState } from "react";
 
 import formatCurrency from "../../utilities/formatCurrency";
-import orderCusServices from "../../services/orderCusServices";
+import orderCusService from "../../services/orderCusService";
 
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { useDispatch, useSelector } from "react-redux";
-import userService from "../../services/userService";
-import { updateInfo } from ".././../store/reducers/auth";
+import receiverService from "../../services/receiverService";
+import orderMemService from "../../services/orderMemService";
 
 import CustomButton from "../CustomButton";
 import Input from "../Input";
 import { Item } from "./ItemSelect";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, productDetail, clearCart, removeItem } =
-    useCart();
+  const { closeCart, cartItems, items, clearCart, removeItem } = useCart();
+  const navigate = useNavigate();
 
-  const userInfo = useSelector((state) => state.auth.userInfo);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isWaiting, setIsWaiting] = useState(false);
-  const dispatch = useDispatch();
 
-  //-------------------------Show Receiver Modal-------------------------------------------------
+  const [receiver, setReceiver] = useState([]);
 
-  const [receiverModal, setReceiverModal] = useState(false);
-  const closeReceiverModal = () => setReceiverModal(false);
-  const showReceiverModal = () => setReceiverModal(true);
-
-  const checkChosen = useFormik({
-    initialValues: {
-      Re_Id: 0,
-    },
-
-    onSubmit: (values) => {
-      chosenSubmit(values);
-    },
-  });
-
-  const chosenSubmit = (data) => {
-    setIsWaiting(true);
-    console.log(data.Re_Id);
-    userService.chosenReceiver(data.Re_Id).then((res) => {
-      setIsWaiting(false);
-      if (res.errorCode === 0) {
-        toast.success("Add Successful");
-        const newInfo = {
-          ...userInfo,
-          receiver: res.data.receiver,
-        };
-        dispatch(
-          updateInfo({
-            userInfo: newInfo,
-          })
-        );
-
-        closeReceiverModal();
-        showOrderModal();
-      } else {
-        toast.error(res.message);
-      }
-    });
-  };
-
-  //-------------------------Receiver (get add update delete)-------------------------------------------------
-
-  const [receiverFunctionModal, setReceiverFunctionModal] = useState(false);
-  const closeReceiverFunctionModal = () => setReceiverFunctionModal(false);
-  const showReceiverFunctionModal = () => setReceiverFunctionModal(true);
-
-  const checkReceiver = useFormik({
-    initialValues: {
-      Re_Id: 0,
-      name: "",
-      phone: "",
-      address: "",
-      is_Default: 0,
-    },
-
-    validationSchema: Yup.object({
-      name: Yup.string().required("Required"),
-      phone: Yup.string().required("Required"),
-      address: Yup.string().required("Required"),
-    }),
-
-    onSubmit: (values) => {
-      receiverSubmit(values);
-    },
-  });
-
-  const receiverSubmit = (data) => {
-    if (data.Re_Id === 0) {
-      setIsWaiting(true);
-
-      userService.newReceiver(data).then((res) => {
-        setIsWaiting(false);
-        if (res.errorCode === 0) {
-          toast.success("Add Successful");
-          const newInfo = {
-            ...userInfo,
-            receiver: res.data.receiver,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-          if (data.is_Default) {
-            showOrderModal();
-            closeReceiverFunctionModal();
-          }
-          closeReceiverFunctionModal();
-        } else {
-          toast.error(res.message);
-        }
-      });
-    } else {
-      setIsWaiting(true);
-
-      userService.updateReceiver(data.Re_Id, data).then((res) => {
-        setIsWaiting(false);
-        if (res.errorCode === 0) {
-          toast.success("Update Successful");
-          const newInfo = {
-            ...userInfo,
-            receiver: res.data.receiver,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
-          closeReceiverFunctionModal();
-        } else {
-          toast.error(res.message);
-        }
+  const loadData = () => {
+    if (isLoggedIn) {
+      receiverService.list().then((res) => {
+        setReceiver(res.data);
       });
     }
   };
 
-  const showEditModal = (e, Re_Id) => {
-    if (e) e.preventDefault();
+  useEffect(() => {
+    loadData();
+  });
 
-    if (Re_Id > 0) {
-      userService.getReceiver(Re_Id).then((res) => {
-        if (res.errorCode === 0) {
-          checkReceiver.setValues(res.data);
-          showReceiverFunctionModal();
-        } else {
-          toast.error(res.message);
-        }
-      });
-    } else {
-      checkReceiver.resetForm();
-      checkReceiver.setFieldValue("Re_Id", Re_Id);
-      showReceiverFunctionModal();
-    }
-  };
-
-  const handleDelete = (e, Re_Id) => {
-    if (e) e.preventDefault();
-
-    userService.deleteReceiver(Re_Id).then((res) => {
-      if (res.errorCode === 0) {
-        toast.success("Delete Successful");
-        const newInfo = {
-          ...userInfo,
-          receiver: res.data.receiver,
-        };
-        dispatch(
-          updateInfo({
-            userInfo: newInfo,
-          })
-        );
-      } else {
-        toast.error(res.message);
-      }
-    });
-  };
-
-  //-------------------------Show Customer Modal-------------------------------------------------
+  //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
   const closeCustomerModal = () => setCustomerModal(false);
   const showCustomerModal = () => setCustomerModal(true);
@@ -252,24 +108,158 @@ export function ShoppingCart({ isOpen }) {
       details: details,
     };
 
-    orderCusServices.add(order).then((res) => {
+    orderCusService.add(order).then((res) => {
       console.log(res);
       if (res.errorCode === 0) {
         toast.success("Order submitted");
-        clearCart();
+
         removeItem();
         closeOrderModal();
         closeCustomerModal();
 
         // localStorage.removeItem("shopping-cart");
-        Navigate("/", window.scrollTo(0, 0));
+        navigate("/", window.scrollTo(0, 0));
       } else {
         toast.error(res.message);
       }
     });
   };
 
-  //-------------------------Show Order Modal-------------------------------------------------
+  //-------------------------Receiver (get add update delete)-------------------------------------------------
+
+  const [receiverFunctionModal, setReceiverFunctionModal] = useState(false);
+  const closeReceiverFunctionModal = () => setReceiverFunctionModal(false);
+  const showReceiverFunctionModal = () => setReceiverFunctionModal(true);
+
+  const checkReceiver = useFormik({
+    initialValues: {
+      Re_Id: 0,
+      name: "",
+      phone: "",
+      address: "",
+      is_Default: 0,
+    },
+
+    validationSchema: Yup.object({
+      name: Yup.string().required("Required"),
+      phone: Yup.string().required("Required"),
+      address: Yup.string().required("Required"),
+    }),
+
+    onSubmit: (values) => {
+      receiverSubmit(values);
+    },
+  });
+
+  const receiverSubmit = (data) => {
+    if (data.Re_Id === 0) {
+      setIsWaiting(true);
+
+      receiverService.newReceiver(data).then((res) => {
+        setIsWaiting(false);
+        if (res.errorCode === 0) {
+          toast.success("Add Successful");
+          checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
+          loadData();
+
+          closeReceiverFunctionModal();
+        } else {
+          toast.error(res.message);
+        }
+      });
+    } else {
+      setIsWaiting(true);
+
+      receiverService.updateReceiver(data.Re_Id, data).then((res) => {
+        setIsWaiting(false);
+        if (res.errorCode === 0) {
+          toast.success("Update Successful");
+          if (res.data.is_Default && res.data.is_Chosen) {
+            checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
+          }
+
+          loadData();
+          closeReceiverFunctionModal();
+        } else {
+          toast.error(res.message);
+        }
+      });
+    }
+  };
+
+  const showEditModal = (e, Re_Id) => {
+    if (e) e.preventDefault();
+
+    if (Re_Id > 0) {
+      receiverService.get(Re_Id).then((res) => {
+        if (res.errorCode === 0) {
+          checkReceiver.setValues(res.data);
+          showReceiverFunctionModal();
+        } else {
+          toast.error(res.message);
+        }
+      });
+    } else {
+      checkReceiver.resetForm();
+      checkReceiver.setFieldValue("Re_Id", Re_Id);
+      showReceiverFunctionModal();
+    }
+  };
+
+  const handleDelete = (e, Re_Id) => {
+    if (e) e.preventDefault();
+
+    receiverService.deleteReceiver(Re_Id).then((res) => {
+      if (res.errorCode === 0) {
+        if (res.data) {
+          setReceiverOrder([]);
+        }
+
+        toast.success("Delete Successful");
+        loadData();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
+
+  //-------------------------Show Receiver Modal-------------------------------------------------
+
+  const [receiverModal, setReceiverModal] = useState(false);
+  const closeReceiverModal = () => setReceiverModal(false);
+  const showReceiverModal = () => setReceiverModal(true);
+
+  const [receiverOrder, setReceiverOrder] = useState([]);
+  const checkChosen = useFormik({
+    initialValues: {
+      Re_Id: 0,
+    },
+
+    onSubmit: (values) => {
+      chosenSubmit(values);
+    },
+  });
+
+  const chosenSubmit = (data) => {
+    setIsWaiting(true);
+    // console.log(data.Re_Id);
+    receiverService.chosenReceiver(data.Re_Id).then((res) => {
+      setIsWaiting(false);
+      if (res.errorCode === 0) {
+        toast.success("Select Successful");
+
+        setReceiverOrder(res.data);
+        loadData();
+
+        closeReceiverModal();
+        showOrderModal();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
+
+  //-------------------------Show Member Order Modal-------------------------------------------------
 
   const [orderModal, setOrderModal] = useState(false);
   const closeOrderModal = () => setOrderModal(false);
@@ -277,39 +267,54 @@ export function ShoppingCart({ isOpen }) {
 
   const resetReceiver = () => {
     if (isLoggedIn) {
-      userService.reset().then((res) => {
+      receiverService.reset().then((res) => {
         if (res.errorCode === 0) {
-          const newInfo = {
-            ...userInfo,
-            receiver: res.data.receiver,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
+          loadData();
+          showOrderModal();
         }
-        showOrderModal();
       });
     }
   };
 
-  const orderSubmit = (e, Re_Id) => {
+  const order = useFormik({
+    initialValues: {
+      ORD_CusNote: "",
+    },
+
+    onSubmit: (values) => {
+      orderSubmit(values);
+      order.resetForm();
+    },
+  });
+
+  const orderSubmit = (e) => {
     if (e) e.preventDefault();
-    console.log(Re_Id);
-    // userService.order(Re_Id).then((res) => {
+
+    const details = [];
+    cartItems.map((item) =>
+      item.select
+        ? details.push({
+            id: item.id,
+            ORDe_Quantity: item.quantity,
+          })
+        : 0
+    );
+
+    const order = {
+      Re_Id: receiverOrder.Re_Id,
+      ORD_CusNote: "",
+      details: details,
+    };
+
+    console.log(order);
+    // orderMemService.order(order).then((res) => {
     //   if (res.errorCode === 0) {
-    //     const newInfo = {
-    //       ...userInfo,
-    //       cart: res.data.cart,
-    //       order: res.data.order,
-    //     };
-    //     dispatch(
-    //       updateInfo({
-    //         userInfo: newInfo,
-    //       })
-    //     );
-    //     closeReceiverModal();
+    //     loadData();
+    //     toast.success("Order submitted");
+
+    //     removeItem();
+    //     closeOrderModal();
+    //     navigate("/", window.scrollTo(0, 0));
     //   }
     // });
   };
@@ -348,8 +353,9 @@ export function ShoppingCart({ isOpen }) {
                 <span className="fw-bold fs-5">
                   {formatCurrency(
                     cartItems.reduce((total, cartItem) => {
-                      const item = productDetail.find(
-                        (i) => i.id === cartItem.id && cartItem.select === 1
+                      const item = items.find(
+                        (i) =>
+                          i.ProDe_Id === cartItem.id && cartItem.select === 1
                       );
                       return total + (item?.Pro_Price || 0) * cartItem.quantity;
                     }, 0)
@@ -358,23 +364,21 @@ export function ShoppingCart({ isOpen }) {
               </Col>
             </Row>
 
-            {isLoggedIn ? (
-              <Button onClick={resetReceiver} disabled={!cartItems.length}>
-                Book Item
-              </Button>
-            ) : (
-              <Button
-                onClick={showCustomerModal}
-                disabled={
-                  !cartItems.reduce((count, cartItem) => {
-                    if (cartItem.select === 1) count++;
-                    return count;
-                  }, 0)
-                }
-              >
-                Book Item
-              </Button>
-            )}
+            <Button
+              onClick={() =>
+                isLoggedIn
+                  ? (resetReceiver(), showCustomerModal())
+                  : showCustomerModal()
+              }
+              disabled={
+                !cartItems.reduce((count, cartItem) => {
+                  if (cartItem.select === 1) count++;
+                  return count;
+                }, 0)
+              }
+            >
+              Book Item
+            </Button>
           </Stack>
         </Offcanvas.Body>
       </Offcanvas>
@@ -395,10 +399,10 @@ export function ShoppingCart({ isOpen }) {
 
             <Modal.Body>
               <Table responsive borderless className=" rounded-4 bg-icon">
-                {/* <tbody>
-                  {userInfo.receiver.length !== 0 ? (
+                <tbody>
+                  {receiver.length !== 0 ? (
                     <>
-                      {userInfo.receiver.map((list) => (
+                      {receiver.map((list) => (
                         <tr key={list.Re_Id}>
                           {list.is_Default ? (
                             <>
@@ -455,7 +459,7 @@ export function ShoppingCart({ isOpen }) {
                         </tr>
                       ))}
 
-                      {userInfo.receiver.map((list) => (
+                      {receiver.map((list) => (
                         <tr key={list.Re_Id}>
                           {!list.is_Default && list.is_Chosen ? (
                             <>
@@ -578,7 +582,7 @@ export function ShoppingCart({ isOpen }) {
                       </Button>
                     </td>
                   </tr>
-                </tbody> */}
+                </tbody>
               </Table>
             </Modal.Body>
 
@@ -818,191 +822,121 @@ export function ShoppingCart({ isOpen }) {
           <Modal.Title>Order</Modal.Title>
         </Modal.Header>
 
-        {/* <Modal.Body>
-          {userInfo.cart.total !== 0 ? (
-            <>
-              {userInfo.receiver.length !== 0 ? (
-                <>
-                  {userInfo.receiver.map((list) => (
-                    <div key={list.Re_Id}>
-                      {list.is_Chosen ? (
-                        <Card
-                          as={Button}
-                          onClick={() => {
-                            checkChosen.setFieldValue("Re_Id", list.Re_Id);
-                            showReceiverModal();
-                            closeOrderModal();
-                          }}
-                          className="bg-light text-black border-dark bg-icon text-start"
-                        >
-                          <Card.Body>
-                            <Card.Title as="h4" className="text-center">
-                              Receiver
-                            </Card.Title>
-                            <Row className="row-cols-1">
-                              <Col>
-                                <span className="h4">Name: </span>
-                                {list.name} |
-                                <span className="h4"> Phone: </span>
-                                {list.phone}
-                              </Col>
+        {isLoggedIn ? (
+          <Modal.Body>
+            {receiverOrder.length !== 0 ? (
+              <>
+                <Card
+                  as={Button}
+                  onClick={() => {
+                    checkChosen.setFieldValue("Re_Id", receiverOrder.Re_Id);
+                    showReceiverModal();
+                    closeOrderModal();
+                  }}
+                  className="bg-light text-black border-dark bg-icon text-start"
+                >
+                  <Card.Body>
+                    <Card.Title as="h4" className="text-center">
+                      Receiver
+                    </Card.Title>
+                    <Row className="row-cols-1">
+                      <Col>
+                        <span className="h4">Name: </span>
+                        {receiverOrder.name} |
+                        <span className="h4"> Phone: </span>
+                        {receiverOrder.phone}
+                      </Col>
 
-                              <Col>
-                                <span className="h4">Address: </span>
-                                {list.address}
-                              </Col>
-                            </Row>
-                          </Card.Body>
-                        </Card>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  ))}
-
-                  {userInfo.receiver.map((list) => (
-                    <div key={list.Re_Id}>
-                      {!list.is_Default ? (
-                        <Row className="text-center pb-3">
-                          <h1>Please chose receiver!</h1>
-                          <Button
-                            variant="primary"
-                            onClick={() => {
-                              showReceiverModal();
-                              closeOrderModal();
-                            }}
-                          >
-                            Select Receiver
-                          </Button>
-                        </Row>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <Row className="text-center pb-3">
-                  <h1>Please chose receiver!</h1>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      showReceiverModal();
-                      closeOrderModal();
-                    }}
-                  >
-                    Select Receiver
-                  </Button>
-                </Row>
-              )}
-
-              {userInfo.cart.cart_detail.map((item) => (
-                <div key={item.id}>
-                  {item.is_Selected ? (
-                    <>
-                      <Row className="d-flex align-items-center p-2 bg-light ">
-                        <Col>
-                          <Row sm={3}>
-                            <Col className="p-0">
-                              <Image
-                                src={item.product_detail.Pro_Avatar}
-                                className="img-fluid"
-                              />
-                            </Col>
-
-                            <Col className="px-2 ">
-                              <Col>{item.product_detail.Pro_Name}</Col>
-                              <Col>x {item.CartDe_Quantity}</Col>
-                              <Col className="fs-6">
-                                {formatCurrency(item.CartDe_Price)}
-                              </Col>
-                            </Col>
-                          </Row>
-                        </Col>
-                      </Row>
-                    </>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-              ))}
-            </>
-          ) : (
-            <h4 className="text-center">
-              You haven't chosen any product yet. Please go back and select at
-              least one product.
-            </h4>
-          )}
-        </Modal.Body> */}
-
-        <Modal.Body>
-          <Card className="bg-light text-black border-dark bg-icon text-start">
-            <Card.Body>
-              <Card.Title as="h4" className="text-center">
-                Receiver
-              </Card.Title>
-              <Row className="row-cols-1">
-                <Col>
-                  <span className="h4">Name: </span>
-                  {formik.values.ORD_Name} |<span className="h4"> Phone: </span>
-                  {formik.values.Cus_Phone}
-                </Col>
-
-                <Col>
-                  <span className="h4">Address: </span>
-                  {formik.values.ORD_Address}
-                </Col>
+                      <Col>
+                        <span className="h4">Address: </span>
+                        {receiverOrder.address}
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </>
+            ) : (
+              <Row className="text-center pb-3">
+                <h1>Please chose receiver!</h1>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    showReceiverModal();
+                    closeOrderModal();
+                  }}
+                >
+                  Select Receiver
+                </Button>
               </Row>
-            </Card.Body>
-          </Card>
-          {cartItems.map((item, index) => (
-            <Item key={index} {...item} />
-          ))}
-        </Modal.Body>
+            )}
+            <Row className="mb-3">
+              <Form>
+                <Form.Group>
+                  <Form.Label>Note</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    type="text"
+                    {...order.getFieldProps("ORD_CusNote")}
+                  />
+                </Form.Group>
+              </Form>
+            </Row>
+            {cartItems.map((item, index) => (
+              <Item key={index} {...item} />
+            ))}
+          </Modal.Body>
+        ) : (
+          <Modal.Body>
+            <Card className="bg-light text-black border-dark bg-icon text-start">
+              <Card.Body>
+                <Card.Title as="h4" className="text-center">
+                  Receiver
+                </Card.Title>
+                <Row className="row-cols-1">
+                  <Col>
+                    <span className="h4">Name: </span>
+                    {formik.values.ORD_Name} |
+                    <span className="h4"> Phone: </span>
+                    {formik.values.Cus_Phone}
+                  </Col>
+
+                  <Col>
+                    <span className="h4">Address: </span>
+                    {formik.values.ORD_Address}
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+            {cartItems.map((item, index) => (
+              <Item key={index} {...item} />
+            ))}
+          </Modal.Body>
+        )}
 
         <Modal.Footer>
           <Button variant="secondary" onClick={closeOrderModal}>
             Close
           </Button>
-          {/* {userInfo.cart.total !== 0 ? (
-            <>
-              {userInfo.receiver.length !== 0 ? (
-                <>
-                  {userInfo.receiver.map((list) => (
-                    <span key={list.Re_Id}>
-                      {list.is_Default ? (
-                        <Button
-                          type="submit"
-                          variant="primary"
-                          onClick={(e) => orderSubmit(e, list.Re_Id)}
-                        >
-                          Confirm
-                        </Button>
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <Button type="submit" variant="primary" disabled>
-                    Confirm
-                  </Button>
-                </>
-              )}
-            </>
+
+          {isLoggedIn ? (
+            <Button
+              type="submit"
+              variant="primary"
+              onClick={formik.handleSubmit}
+            >
+              Confirm
+            </Button>
           ) : (
-            ""
-          )} */}
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={!formik.dirty || !formik.isValid}
-            onClick={formik.handleSubmit}
-          >
-            Confirm
-          </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!formik.dirty || !formik.isValid}
+              onClick={formik.handleSubmit}
+            >
+              Confirm
+            </Button>
+          )}
         </Modal.Footer>
       </Modal>
     </>

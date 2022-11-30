@@ -1,6 +1,6 @@
 import React from "react";
 import { Container, Row } from "react-bootstrap";
-import OtherHeader from "../components/OtherHeader";
+import OtherHeader from "../components/header/OtherHeader";
 import Store from "../components/ourProducts/Store";
 
 const OurProducts = () => {

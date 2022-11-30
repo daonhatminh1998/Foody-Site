@@ -3,7 +3,7 @@ import About from "../components/About";
 import Blog from "../components/Blog";
 import Features from "../components/Features";
 import Firm from "../components/Firm";
-import HomeHeader from "../components/HomeHeader";
+import HomeHeader from "../components/header/HomeHeader";
 import Store from "../components/ourProducts/Store";
 import Testimonial from "../components/Testimonial";
 

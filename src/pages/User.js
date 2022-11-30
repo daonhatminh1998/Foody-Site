@@ -16,11 +16,13 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 import { logout, updateInfo } from ".././store/reducers/auth";
-import userService from "../services/userService";
-import orderCusServices from "../services/orderCusServices";
 
+import userService from "../services/userService";
+import orderMemService from "../services/orderMemService";
+import receiverService from "../services/receiverService";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
@@ -36,6 +38,25 @@ const User = () => {
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
+
+  const [receiver, setReceiver] = useState([]);
+  const [order, setOrder] = useState([]);
+
+  const loadData = () => {
+    if (isLoggedIn) {
+      receiverService.list().then((res) => {
+        setReceiver(res.data);
+      });
+
+      orderMemService.list().then((res) => {
+        setOrder(res.data);
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  });
 
   //-------------------------Change Password-------------------------------------------
   const passwordRef = React.useRef();
@@ -77,8 +98,8 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Change password successful");
           formik.resetForm();
+          navigate("Login", window.scrollTo(0, 0));
           dispatch(logout());
-          navigate("/Login");
         } else {
           toast.error(res.message);
         }
@@ -168,19 +189,12 @@ const User = () => {
     if (data.Re_Id === 0) {
       setIsWaiting(true);
 
-      userService.newReceiver(data).then((res) => {
+      receiverService.newReceiver(data).then((res) => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
           toast.success("Add Successful");
-          const newInfo = {
-            ...userInfo,
-            receiver: res.data.receiver,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
+
+          loadData();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -189,19 +203,12 @@ const User = () => {
     } else {
       setIsWaiting(true);
 
-      userService.updateReceiver(data.Re_Id, data).then((res) => {
+      receiverService.updateReceiver(data.Re_Id, data).then((res) => {
         setIsWaiting(false);
         if (res.errorCode === 0) {
           toast.success("Update Successful");
-          const newInfo = {
-            ...userInfo,
-            receiver: res.data.receiver,
-          };
-          dispatch(
-            updateInfo({
-              userInfo: newInfo,
-            })
-          );
+
+          loadData();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -214,7 +221,7 @@ const User = () => {
     if (e) e.preventDefault();
 
     if (Re_Id > 0) {
-      userService.getReceiver(Re_Id).then((res) => {
+      receiverService.get(Re_Id).then((res) => {
         if (res.errorCode === 0) {
           checkReceiver.setValues(res.data);
           showReceiverModal();
@@ -231,18 +238,11 @@ const User = () => {
   const handleDelete = (e, Re_Id) => {
     if (e) e.preventDefault();
 
-    userService.deleteReceiver(Re_Id).then((res) => {
+    receiverService.deleteReceiver(Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
-        const newInfo = {
-          ...userInfo,
-          receiver: res.data.receiver,
-        };
-        dispatch(
-          updateInfo({
-            userInfo: newInfo,
-          })
-        );
+
+        loadData();
       } else {
         toast.error(res.message);
       }
@@ -275,18 +275,11 @@ const User = () => {
   };
 
   const defaultSubmit = (data) => {
-    userService.defaultReceiver(data.Re_Id).then((res) => {
+    receiverService.defaultReceiver(data.Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Change Successful");
-        const newInfo = {
-          ...userInfo,
-          receiver: res.data.receiver,
-        };
-        dispatch(
-          updateInfo({
-            userInfo: newInfo,
-          })
-        );
+        loadData();
+
         closeDefaultModal();
       } else {
         toast.error(res.message);
@@ -324,7 +317,7 @@ const User = () => {
   const showOrderInfoModal = (e, ORD_Id) => {
     if (e) e.preventDefault();
 
-    orderCusServices.get(ORD_Id).then((res) => {
+    orderMemService.get(ORD_Id).then((res) => {
       if (res.errorCode === 0) {
         orderFormik.setValues(res.data);
         showOrderInfo();
@@ -332,766 +325,725 @@ const User = () => {
     });
   };
 
-  return (
-    <>
-      {isLoggedIn ? (
-        <section className=" my-5 bg-icon">
-          <Container>
-            <CardGroup className="bg-white shadow rounded-4 d-block d-sm-flex">
-              <Tab.Container defaultActiveKey="account">
-                <Row className="pb-3">
-                  <Col md={5} lg={4} className="rounded-5">
-                    <Card className="profile-tab-nav rounded-5 border-0">
-                      <Card.Img
-                        src={userInfo.bgimg}
-                        className=" img-fluRe_Re_Re_Id rounded-4"
-                      />
-                      <Card.ImgOverlay>
-                        <div className="img-circle text-center mb-3">
-                          <Card.Img src={userInfo.avatar} className="shadow" />
-                        </div>
-                      </Card.ImgOverlay>
+  if (isLoggedIn) {
+    return (
+      <section className=" my-5 bg-icon">
+        <Container>
+          <CardGroup className="bg-white shadow rounded-4 d-block d-sm-flex">
+            <Tab.Container defaultActiveKey="account">
+              <Row className="pb-3">
+                <Col md={5} lg={4} className="rounded-5">
+                  <Card className="profile-tab-nav rounded-5 border-0">
+                    <Card.Img
+                      src={userInfo.bgimg}
+                      className=" img-fluRe_Re_Re_Id rounded-4"
+                    />
+                    <Card.ImgOverlay>
+                      <div className="img-circle text-center mb-3">
+                        <Card.Img src={userInfo.avatar} className="shadow" />
+                      </div>
+                    </Card.ImgOverlay>
 
-                      <Card.Title className="text-center ">
-                        <h1>{userInfo.name} </h1>
-                      </Card.Title>
-                      <Card.Subtitle className="mb-2 text-muted text-center">
-                        UId: {userInfo.Mem_Id}
-                      </Card.Subtitle>
+                    <Card.Title className="text-center ">
+                      <h1>{userInfo.name} </h1>
+                    </Card.Title>
 
-                      <Nav className="flex-column" variant="pills">
-                        <ListGroup variant="flush">
-                          <ListGroup.Item>
-                            <Nav.Link eventKey="account">
-                              <i className="fa fa-home text-center pe-4" />
-                              Account
-                            </Nav.Link>
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <Nav.Link eventKey="change-password">
-                              <i className="fa fa-key pe-1" />
-                              Password
-                            </Nav.Link>
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <Nav.Link
-                              eventKey="edit-profile"
-                              onClick={editProfile}
-                            >
-                              <i className="bi-pencil-square pe-1" />
-                              Edit Profile
-                            </Nav.Link>
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <Nav.Link eventKey="receiver">
-                              <i className="bi-pencil-square pe-1" />
-                              Receiver
-                            </Nav.Link>
-                          </ListGroup.Item>
-                          <ListGroup.Item>
-                            <Nav.Link eventKey="order-history">
-                              <i className="bi-pencil-square pe-1" />
-                              History
-                            </Nav.Link>
-                          </ListGroup.Item>
-                        </ListGroup>
-                      </Nav>
-                    </Card>
-                  </Col>
+                    <Card.Subtitle className="mb-2 text-muted text-center">
+                      UId: {userInfo.Mem_Id}
+                    </Card.Subtitle>
 
-                  <Col>
-                    <Card className=" border-0 pt-4 ">
-                      <Tab.Content>
-                        {/* -------------------------Account Info------------------------------------------- */}
-
-                        <Tab.Pane
-                          eventKey="account"
-                          className="px-lg-5 pt-lg-2 px-sm-2"
-                        >
-                          <h1 className="pt-lg-2 ">Account</h1>
-                          <Container className="bg-light bg-icon rounded-4 py-5">
-                            <Row sm={1}>
-                              <Col>
-                                <Row sm={2}>
-                                  <Col sm={4}>Join date: </Col>
-                                  <Col>{userInfo.created_at}</Col>
-                                </Row>
-                              </Col>
-
-                              <Col>
-                                <Row sm={2}>
-                                  <Col sm={4}>Last seen: </Col>
-                                  <Col>{userInfo.updated_at}</Col>
-                                </Row>
-                              </Col>
-
-                              <Col>
-                                <Row sm={2}>
-                                  <Col sm={4}>Username: </Col>
-                                  <Col>{userInfo.username}</Col>
-                                </Row>
-                              </Col>
-
-                              <Col>
-                                <Row sm={2}>
-                                  <Col sm={4}>email: </Col>
-                                  <Col>{userInfo.email}</Col>
-                                </Row>
-                              </Col>
-                            </Row>
-                          </Container>
-                        </Tab.Pane>
-
-                        {/* -------------------------Change Password------------------------------------------- */}
-
-                        <Tab.Pane
-                          eventKey="change-password"
-                          className="px-lg-5 pt-lg-2 px-sm-2"
-                        >
-                          <h1 className="pt-lg-2">Change Password</h1>
-                          <Form
-                            onSubmit={handleFormSubmit}
-                            className="px-lg-5 pt-lg-5 pt-sm-2 px-sm-4"
+                    <Nav className="flex-column" variant="pills">
+                      <ListGroup variant="flush">
+                        <ListGroup.Item>
+                          <Nav.Link eventKey="account">
+                            <i className="fa fa-home text-center pe-4" />
+                            Account
+                          </Nav.Link>
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                          <Nav.Link eventKey="change-password">
+                            <i className="fa fa-key pe-1" />
+                            Password
+                          </Nav.Link>
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                          <Nav.Link
+                            eventKey="edit-profile"
+                            onClick={editProfile}
                           >
-                            <Form.Group as={Row} className="mb-2">
-                              <Form.Label
-                                className="required"
-                                as={Col}
-                                sm={7}
-                                lg={3}
-                              >
-                                Password
-                              </Form.Label>
-                              <Col sm={11} lg={8}>
-                                <Form.Control
-                                  ref={passwordRef}
-                                  type="password"
-                                  placeholder="Enter password"
-                                  {...formik.getFieldProps("password")}
-                                  isvalid={
-                                    formik.touched.password &&
-                                    !formik.errors.password
-                                  }
-                                  isInvalid={
-                                    formik.touched.password &&
-                                    formik.errors.password
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                  {formik.errors.password}
-                                </Form.Control.Feedback>
-                              </Col>
-                            </Form.Group>
-
-                            <Form.Group as={Row} className="mb-2">
-                              <Form.Label
-                                className="required"
-                                as={Col}
-                                sm={7}
-                                lg={3}
-                              >
-                                New Password
-                              </Form.Label>
-                              <Col sm={11} lg={8}>
-                                <Form.Control
-                                  ref={newPasswordRef}
-                                  type="password"
-                                  placeholder="Enter new password"
-                                  {...formik.getFieldProps("newPassword")}
-                                  isvalid={
-                                    formik.touched.newPassword &&
-                                    !formik.errors.newPassword
-                                  }
-                                  isInvalid={
-                                    formik.touched.newPassword &&
-                                    formik.errors.newPassword
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
-                                  {formik.errors.newPassword}
-                                </Form.Control.Feedback>
-                              </Col>
-                            </Form.Group>
-
-                            <Form.Group as={Row} className="mb-3">
-                              <Form.Label
-                                className="required"
-                                as={Col}
-                                sm={7}
-                                lg={3}
-                              >
-                                Confirm Password
-                              </Form.Label>
-                              <Col sm={11} lg={8}>
-                                <Form.Control
-                                  ref={confirmPasswordRef}
-                                  type="password"
-                                  placeholder="Enter password"
-                                  {...formik.getFieldProps("confirmPassword")}
-                                  isvalid={
-                                    formik.touched.confirmPassword &&
-                                    !formik.errors.confirmPassword
-                                  }
-                                  isInvalid={
-                                    formik.touched.confirmPassword &&
-                                    formik.errors.confirmPassword
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
-                                  {formik.errors.confirmPassword}
-                                </Form.Control.Feedback>
-                              </Col>
-                            </Form.Group>
-
-                            <CustomButton
-                              type="submit"
-                              color="primary"
-                              disabled={isWaiting}
-                              isLoading={isWaiting}
-                            >
-                              Save
-                            </CustomButton>
-                          </Form>
-                        </Tab.Pane>
-                        {/* -------------------------Edit Profile------------------------------------------- */}
-
-                        <Tab.Pane
-                          eventKey="edit-profile"
-                          className="px-lg-5 pt-lg-2 px-sm-2"
-                        >
-                          <h1 className="pt-lg-2">Edit Profile</h1>
-                          <Form
-                            onSubmit={infoSubmit}
-                            className="px-lg-5 pt-lg-5 pt-sm-2 px-sm-4"
-                          >
-                            <Form.Group as={Row} className="mb-2">
-                              <Form.Label
-                                className="required"
-                                as={Col}
-                                sm={7}
-                                lg={3}
-                              >
-                                name
-                              </Form.Label>
-                              <Col sm={11} lg={8}>
-                                <Form.Control
-                                  ref={nameRef}
-                                  type="text"
-                                  {...changeInfo.getFieldProps("name")}
-                                  isvalid={
-                                    changeInfo.touched.name &&
-                                    !changeInfo.errors.name
-                                  }
-                                  isInvalid={
-                                    changeInfo.touched.name &&
-                                    changeInfo.errors.name
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
-                                  {changeInfo.errors.name}
-                                </Form.Control.Feedback>
-                              </Col>
-                            </Form.Group>
-
-                            <Form.Group as={Row} className="mb-2">
-                              <Form.Label
-                                className="required"
-                                as={Col}
-                                sm={7}
-                                lg={3}
-                              >
-                                email
-                              </Form.Label>
-                              <Col sm={11} lg={8}>
-                                <Form.Control
-                                  ref={emailRef}
-                                  type="email"
-                                  {...changeInfo.getFieldProps("email")}
-                                  isvalid={
-                                    changeInfo.touched.email &&
-                                    !changeInfo.errors.email
-                                  }
-                                  isInvalid={
-                                    changeInfo.touched.email &&
-                                    changeInfo.errors.email
-                                  }
-                                />
-                                <Form.Control.Feedback type="invalRe_Re_Re_Id">
-                                  {changeInfo.errors.email}
-                                </Form.Control.Feedback>
-                              </Col>
-                            </Form.Group>
-
-                            <CustomButton
-                              type="submit"
-                              color="primary"
-                              disabled={isWaiting}
-                              isLoading={isWaiting}
-                            >
-                              Save
-                            </CustomButton>
-                          </Form>
-                        </Tab.Pane>
-
-                        {/* -------------------------Receiver------------------------------------------- */}
-
-                        <Tab.Pane
-                          eventKey="receiver"
-                          className="px-lg-5 pt-lg-2 px-sm-2"
-                        >
-                          <h1 className="pt-lg-2 pb-3 ">Receiver</h1>
-
-                          <Table
-                            responsive
-                            borderless
-                            className="bg-light rounded-4 bg-icon"
-                          >
-                            <tbody>
-                              {userInfo.receiver.length !== 0 ? (
-                                <>
-                                  {userInfo.receiver.map((list) => (
-                                    <tr key={list.Re_Id}>
-                                      {list.is_Default ? (
-                                        <>
-                                          <td className="py-3">
-                                            {/* <Form.Check
-                                              type="switch"
-                                              value={list.is_Default}
-                                              checked={list.is_Default}
-                                              // as={Button}
-
-                                              onChange={(e) => {
-                                                // defaultReceiver(
-                                                //   e,
-                                                //   list.Re_Id,
-                                                //   1
-                                                // );
-                                              }}
-                                            /> */}
-
-                                            <Form
-                                              className="bg-primary"
-                                              as={Button}
-                                              onClick={(e) => {
-                                                defaultReceiver(
-                                                  e,
-                                                  list.Re_Id,
-                                                  1
-                                                );
-                                              }}
-                                            />
-                                          </td>
-
-                                          <td className="border-bottom border-dark py-3">
-                                            <Row sm={1}>
-                                              <Col>
-                                                {list.name} | {list.phone}
-                                              </Col>
-                                              <Col className="text-muted fs-6">
-                                                {list.address}
-                                              </Col>
-
-                                              <Col
-                                                sm={12}
-                                                className=" fs-6 pt-2"
-                                              >
-                                                <span className="text-danger border border-2 border-danger px-2">
-                                                  Default
-                                                </span>
-                                              </Col>
-                                            </Row>
-                                          </td>
-
-                                          <td
-                                            className=" py-3"
-                                            style={{ width: "50px" }}
-                                          >
-                                            <a
-                                              href="/#"
-                                              onClick={(e) =>
-                                                showEditModal(e, list.Re_Id)
-                                              }
-                                            >
-                                              <i className="bi-pencil-square text-primary" />
-                                            </a>
-                                            <a
-                                              href="/#"
-                                              onClick={(e) =>
-                                                handleDelete(e, list.Re_Id)
-                                              }
-                                            >
-                                              <i className="bi-trash text-danger" />
-                                            </a>
-                                          </td>
-                                        </>
-                                      ) : (
-                                        <></>
-                                      )}
-                                    </tr>
-                                  ))}
-
-                                  {userInfo.receiver.map((list) => (
-                                    <tr key={list.Re_Id}>
-                                      {!list.is_Default ? (
-                                        <>
-                                          <td className="py-3">
-                                            {/* <Form.Check
-                                              type="switch"
-                                              value={list.is_Default}
-                                              checked={list.is_Default}
-                                              // className="bg-secondary"
-                                              // as={Button}
-                                              onChange={(e) => {
-                                                defaultReceiver(
-                                                  e,
-                                                  list.Re_Id,
-                                                  1
-                                                );
-                                              }}
-                                            /> */}
-
-                                            <Form
-                                              className="bg-secondary"
-                                              as={Button}
-                                              onClick={(e) => {
-                                                defaultReceiver(
-                                                  e,
-                                                  list.Re_Id,
-                                                  list.is_Default
-                                                );
-                                              }}
-                                            />
-                                          </td>
-
-                                          <td className="border-bottom border-dark py-3">
-                                            <Row sm={1}>
-                                              <Col>
-                                                {list.name} | {list.phone}
-                                              </Col>
-                                              <Col className="text-muted fs-6">
-                                                {list.address}
-                                              </Col>
-                                            </Row>
-                                          </td>
-
-                                          <td
-                                            className=" py-3"
-                                            style={{ width: "50px" }}
-                                          >
-                                            <a
-                                              href="/#"
-                                              onClick={(e) =>
-                                                showEditModal(e, list.Re_Id)
-                                              }
-                                            >
-                                              <i className="bi-pencil-square text-primary" />
-                                            </a>
-                                            <a
-                                              href="/#"
-                                              onClick={(e) =>
-                                                handleDelete(e, list.Re_Id)
-                                              }
-                                            >
-                                              <i className="bi-trash text-danger" />
-                                            </a>
-                                          </td>
-                                        </>
-                                      ) : (
-                                        <></>
-                                      )}
-                                    </tr>
-                                  ))}
-                                </>
-                              ) : (
-                                <tr className="text-center ">
-                                  <td colSpan={3} className="py-3">
-                                    <h1>You don't have any receiver!</h1>
-                                  </td>
-                                </tr>
-                              )}
-
-                              <tr className="text-center ">
-                                <td colSpan={3} className="py-3">
-                                  <Button
-                                    variant="primary"
-                                    type="button"
-                                    onClick={() => showEditModal(null, 0)}
-                                  >
-                                    <i className="bi-plus-lg" /> Add More
-                                  </Button>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </Table>
-                        </Tab.Pane>
-
-                        {/* -------------------------Order History------------------------------------------- */}
-
-                        <Tab.Pane
-                          eventKey="order-history"
-                          className="px-lg-5 pt-lg-2 px-sm-2 "
-                        >
-                          <h1 className="pt-lg-2 pb-3">History</h1>
-
-                          <Table
-                            responsive
-                            bordered
-                            className="bg-light bg-icon text-center "
-                          >
-                            <thead>
-                              <tr className="bg-primary align-mRe_Re_Re_Iddle">
-                                <th>Order Id</th>
-                                <th>Receiver</th>
-                                <th>Date Order</th>
-                                <th>Order Info</th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {userInfo.order.length !== 0 ? (
-                                <>
-                                  {userInfo.order.map((list) => (
-                                    <tr key={list.ORD_Id}>
-                                      <td>{list.ORD_Code}</td>
-                                      <td>{list.ORD_Name}</td>
-                                      <td>{list.ORD_DateTime}</td>
-                                      <td>
-                                        <Row sm={1}>
-                                          <Col>View more</Col>
-                                          <Col>
-                                            <a
-                                              href="/#"
-                                              onClick={(e) =>
-                                                showOrderInfoModal(
-                                                  e,
-                                                  list.ORD_Id
-                                                )
-                                              }
-                                            >
-                                              <i className="bi bi-eye-fill text-primary pe-2" />
-                                            </a>
-                                          </Col>
-                                        </Row>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </>
-                              ) : (
-                                <tr className="text-center ">
-                                  <td colSpan={4} className="py-3">
-                                    <h1>You don't have any order!</h1>
-                                  </td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </Table>
-                        </Tab.Pane>
-                      </Tab.Content>
-                    </Card>
-                  </Col>
-                </Row>
-              </Tab.Container>
-            </CardGroup>
-          </Container>
-
-          {/* -------------------------Modal Default------------------------------------------- */}
-          <Modal show={defaultModal} onHide={closeDefaultModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Default Receiver</Modal.Title>
-            </Modal.Header>
-            {checkDefault.values.is_Default ? (
-              <Modal.Body>
-                <h4 className="text-center">
-                  Do you want to remove the default?
-                </h4>
-              </Modal.Body>
-            ) : (
-              <Modal.Body>
-                <h4 className="text-center">
-                  Do you want this receiver to be the default?
-                </h4>
-              </Modal.Body>
-            )}
-
-            <Modal.Footer>
-              <Button variant="secondary" onClick={closeDefaultModal}>
-                No
-              </Button>
-
-              <Button variant="primary" onClick={checkDefault.handleSubmit}>
-                Yes
-              </Button>
-            </Modal.Footer>
-          </Modal>
-
-          {/* -------------------------Modal Receiver (get add update delete)------------------------------------------- */}
-          <Modal show={receiverModal} onHide={closeReceiverModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>
-                Receiver
-                <small className="text-muted">
-                  {checkReceiver.values.Re_Id === 0 ? " new" : " edit"}
-                </small>
-              </Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body>
-              <Form>
-                <Input
-                  label="name"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("name")}
-                  errMessage={
-                    checkReceiver.touched.name && checkReceiver.errors.name
-                  }
-                />
-                <Input
-                  label="phone"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("phone")}
-                  errMessage={
-                    checkReceiver.touched.phone && checkReceiver.errors.phone
-                  }
-                />
-                <Input
-                  label="address"
-                  maxLength="50"
-                  required
-                  formField={checkReceiver.getFieldProps("address")}
-                  errMessage={
-                    checkReceiver.touched.address &&
-                    checkReceiver.errors.address
-                  }
-                />
-
-                <Form.Check
-                  type="switch"
-                  value={checkReceiver.values.is_Default}
-                  checked={checkReceiver.values.is_Default}
-                  onChange={() =>
-                    checkReceiver.setFieldValue(
-                      "is_Default",
-                      checkReceiver.values.is_Default ? 0 : 1
-                    )
-                  }
-                />
-              </Form>
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Button variant="secondary" onClick={closeReceiverModal}>
-                Close
-              </Button>
-
-              <CustomButton
-                type="submit"
-                color="primary"
-                disabled={isWaiting}
-                isLoading={isWaiting}
-                onClick={checkReceiver.handleSubmit}
-              >
-                Save
-              </CustomButton>
-            </Modal.Footer>
-          </Modal>
-
-          {/* -------------------------Modal Order Info------------------------------------------------- */}
-
-          <Modal
-            dialogClassName="modal-80w"
-            show={orderInfoModal}
-            onHide={closeOrderInfo}
-          >
-            <Modal.Header className="bg-light bg-icon">
-              <Modal.Title>
-                Order{" "}
-                <small className="text-muted">
-                  {orderFormik.values.ORD_Code}
-                </small>
-              </Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body className="bg-light bg-icon">
-              <Row>
-                <Col>
-                  <Row className="mb-3">
-                    <Col sm="3" md={5}>
-                      Receiver Name:
-                    </Col>
-                    <Col>{orderFormik.values.ORD_Name}</Col>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Col sm="3" md={5}>
-                      Phone:
-                    </Col>
-                    <Col>{orderFormik.values.ORD_Phone}</Col>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Col sm="3" lg={2}>
-                      Address:
-                    </Col>
-                    <Col>{orderFormik.values.ORD_Address}</Col>
-                  </Row>
-
-                  <Row className="mb-3">
-                    <Col sm="3" lg={2}>
-                      Note:
-                    </Col>
-                    <Col>{orderFormik.values.ORD_CusNote}</Col>
-                  </Row>
+                            <i className="bi-pencil-square pe-1" />
+                            Edit Profile
+                          </Nav.Link>
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                          <Nav.Link eventKey="receiver">
+                            <i className="bi-pencil-square pe-1" />
+                            Receiver
+                          </Nav.Link>
+                        </ListGroup.Item>
+                        <ListGroup.Item>
+                          <Nav.Link eventKey="order-history">
+                            <i className="bi-pencil-square pe-1" />
+                            History
+                          </Nav.Link>
+                        </ListGroup.Item>
+                      </ListGroup>
+                    </Nav>
+                  </Card>
                 </Col>
 
-                <Card as={Col} className="border-primary me-2">
-                  <CardHeader as={Row} className="pt-3 pb-0">
-                    <Card.Title as={Col}>
-                      <h3>
-                        Order <small className="text-muted">list</small>
-                      </h3>
-                    </Card.Title>
-                  </CardHeader>
+                <Col>
+                  <Card className=" border-0 pt-4 ">
+                    <Tab.Content>
+                      {/* -------------------------Account Info------------------------------------------- */}
 
-                  <Card.Body>
-                    <Table
-                      striped
-                      responsive
-                      bordered
-                      hover
-                      className="text-center"
-                    >
-                      <thead>
-                        <tr className="table-primary border-primary ">
-                          <th style={{ width: "50px" }}>#</th>
+                      <Tab.Pane
+                        eventKey="account"
+                        className="px-lg-5 pt-lg-2 px-sm-2"
+                      >
+                        <h1 className="pt-lg-2 ">Account</h1>
+                        <Container className="bg-light bg-icon rounded-4 py-5">
+                          <Row sm={1}>
+                            <Col>
+                              <Row sm={2}>
+                                <Col sm={4}>Join date: </Col>
+                                <Col>{userInfo.created_at}</Col>
+                              </Row>
+                            </Col>
 
-                          <th>Product Name</th>
-                          <th>Quantity</th>
-                          <th>Price</th>
-                          <th>Total</th>
+                            <Col>
+                              <Row sm={2}>
+                                <Col sm={4}>Last seen: </Col>
+                                <Col>{userInfo.updated_at}</Col>
+                              </Row>
+                            </Col>
 
-                          <th style={{ width: "80px" }}></th>
-                        </tr>
-                      </thead>
-                    </Table>
-                  </Card.Body>
-                </Card>
+                            <Col>
+                              <Row sm={2}>
+                                <Col sm={4}>Username: </Col>
+                                <Col>{userInfo.username}</Col>
+                              </Row>
+                            </Col>
+
+                            <Col>
+                              <Row sm={2}>
+                                <Col sm={4}>email: </Col>
+                                <Col>{userInfo.email}</Col>
+                              </Row>
+                            </Col>
+                          </Row>
+                        </Container>
+                      </Tab.Pane>
+
+                      {/* -------------------------Change Password------------------------------------------- */}
+
+                      <Tab.Pane
+                        eventKey="change-password"
+                        className="px-lg-5 pt-lg-2 px-sm-2"
+                      >
+                        <h1 className="pt-lg-2">Change Password</h1>
+                        <Form
+                          onSubmit={handleFormSubmit}
+                          className="px-lg-5 pt-lg-5 pt-sm-2 px-sm-4"
+                        >
+                          <Form.Group as={Row} className="mb-2">
+                            <Form.Label
+                              className="required"
+                              as={Col}
+                              sm={7}
+                              lg={3}
+                            >
+                              Password
+                            </Form.Label>
+                            <Col sm={11} lg={8}>
+                              <Form.Control
+                                ref={passwordRef}
+                                type="password"
+                                placeholder="Enter password"
+                                {...formik.getFieldProps("password")}
+                                isValid={
+                                  formik.touched.password &&
+                                  !formik.errors.password
+                                }
+                                isInvalid={
+                                  formik.touched.password &&
+                                  formik.errors.password
+                                }
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {formik.errors.password}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Form.Group>
+
+                          <Form.Group as={Row} className="mb-2">
+                            <Form.Label
+                              className="required"
+                              as={Col}
+                              sm={7}
+                              lg={3}
+                            >
+                              New Password
+                            </Form.Label>
+                            <Col sm={11} lg={8}>
+                              <Form.Control
+                                ref={newPasswordRef}
+                                type="password"
+                                placeholder="Enter new password"
+                                {...formik.getFieldProps("newPassword")}
+                                isValid={
+                                  formik.touched.newPassword &&
+                                  !formik.errors.newPassword
+                                }
+                                isInvalid={
+                                  formik.touched.newPassword &&
+                                  formik.errors.newPassword
+                                }
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {formik.errors.newPassword}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Form.Group>
+
+                          <Form.Group as={Row} className="mb-3">
+                            <Form.Label
+                              className="required"
+                              as={Col}
+                              sm={7}
+                              lg={3}
+                            >
+                              Confirm Password
+                            </Form.Label>
+                            <Col sm={11} lg={8}>
+                              <Form.Control
+                                ref={confirmPasswordRef}
+                                type="password"
+                                placeholder="Enter password"
+                                {...formik.getFieldProps("confirmPassword")}
+                                isValid={
+                                  formik.touched.confirmPassword &&
+                                  !formik.errors.confirmPassword
+                                }
+                                isInvalid={
+                                  formik.touched.confirmPassword &&
+                                  formik.errors.confirmPassword
+                                }
+                              />
+                              <Form.Control.Feedback type="invalid">
+                                {formik.errors.confirmPassword}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Form.Group>
+
+                          <CustomButton
+                            type="submit"
+                            color="primary"
+                            disabled={isWaiting}
+                            isLoading={isWaiting}
+                          >
+                            Save
+                          </CustomButton>
+                        </Form>
+                      </Tab.Pane>
+                      {/* -------------------------Edit Profile------------------------------------------- */}
+
+                      <Tab.Pane
+                        eventKey="edit-profile"
+                        className="px-lg-5 pt-lg-2 px-sm-2"
+                      >
+                        <h1 className="pt-lg-2">Edit Profile</h1>
+                        <Form
+                          onSubmit={infoSubmit}
+                          className="px-lg-5 pt-lg-5 pt-sm-2 px-sm-4"
+                        >
+                          <Form.Group as={Row} className="mb-2">
+                            <Form.Label
+                              className="required"
+                              as={Col}
+                              sm={7}
+                              lg={3}
+                            >
+                              name
+                            </Form.Label>
+                            <Col sm={11} lg={8}>
+                              <Form.Control
+                                ref={nameRef}
+                                type="text"
+                                {...changeInfo.getFieldProps("name")}
+                                isValid={
+                                  changeInfo.touched.name &&
+                                  !changeInfo.errors.name
+                                }
+                                isInvalid={
+                                  changeInfo.touched.name &&
+                                  changeInfo.errors.name
+                                }
+                              />
+                              <Form.Control.Feedback type="invalRe_Re_Re_Id">
+                                {changeInfo.errors.name}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Form.Group>
+
+                          <Form.Group as={Row} className="mb-2">
+                            <Form.Label
+                              className="required"
+                              as={Col}
+                              sm={7}
+                              lg={3}
+                            >
+                              email
+                            </Form.Label>
+                            <Col sm={11} lg={8}>
+                              <Form.Control
+                                ref={emailRef}
+                                type="email"
+                                {...changeInfo.getFieldProps("email")}
+                                isValid={
+                                  changeInfo.touched.email &&
+                                  !changeInfo.errors.email
+                                }
+                                isInvalid={
+                                  changeInfo.touched.email &&
+                                  changeInfo.errors.email
+                                }
+                              />
+                              <Form.Control.Feedback type="invalRe_Re_Re_Id">
+                                {changeInfo.errors.email}
+                              </Form.Control.Feedback>
+                            </Col>
+                          </Form.Group>
+
+                          <CustomButton
+                            type="submit"
+                            color="primary"
+                            disabled={isWaiting}
+                            isLoading={isWaiting}
+                          >
+                            Save
+                          </CustomButton>
+                        </Form>
+                      </Tab.Pane>
+
+                      {/* -------------------------Receiver------------------------------------------- */}
+
+                      <Tab.Pane
+                        eventKey="receiver"
+                        className="px-lg-5 pt-lg-2 px-sm-2"
+                      >
+                        <h1 className="pt-lg-2 pb-3 ">Receiver</h1>
+
+                        <Table
+                          responsive
+                          borderless
+                          className="bg-light rounded-4 bg-icon"
+                        >
+                          <tbody>
+                            {receiver.length !== 0 ? (
+                              <>
+                                {receiver.map((list) => (
+                                  <tr key={list.Re_Id}>
+                                    {list.is_Default ? (
+                                      <>
+                                        <td className="py-3">
+                                          <Form
+                                            className="bg-primary"
+                                            as={Button}
+                                            onClick={(e) => {
+                                              defaultReceiver(e, list.Re_Id, 1);
+                                            }}
+                                          />
+                                        </td>
+
+                                        <td className="border-bottom border-dark py-3">
+                                          <Row sm={1}>
+                                            <Col>
+                                              {list.name} | {list.phone}
+                                            </Col>
+                                            <Col className="text-muted fs-6">
+                                              {list.address}
+                                            </Col>
+
+                                            <Col sm={12} className=" fs-6 pt-2">
+                                              <span className="text-danger border border-2 border-danger px-2">
+                                                Default
+                                              </span>
+                                            </Col>
+                                          </Row>
+                                        </td>
+
+                                        <td
+                                          className=" py-3"
+                                          style={{ width: "50px" }}
+                                        >
+                                          <a
+                                            href="/#"
+                                            onClick={(e) =>
+                                              showEditModal(e, list.Re_Id)
+                                            }
+                                          >
+                                            <i className="bi-pencil-square text-primary" />
+                                          </a>
+                                          <a
+                                            href="/#"
+                                            onClick={(e) =>
+                                              handleDelete(e, list.Re_Id)
+                                            }
+                                          >
+                                            <i className="bi-trash text-danger" />
+                                          </a>
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </tr>
+                                ))}
+
+                                {receiver.map((list) => (
+                                  <tr key={list.Re_Id}>
+                                    {!list.is_Default ? (
+                                      <>
+                                        <td className="py-3">
+                                          <Form
+                                            className="bg-secondary"
+                                            as={Button}
+                                            onClick={(e) => {
+                                              defaultReceiver(
+                                                e,
+                                                list.Re_Id,
+                                                list.is_Default
+                                              );
+                                            }}
+                                          />
+                                        </td>
+
+                                        <td className="border-bottom border-dark py-3">
+                                          <Row sm={1}>
+                                            <Col>
+                                              {list.name} | {list.phone}
+                                            </Col>
+                                            <Col className="text-muted fs-6">
+                                              {list.address}
+                                            </Col>
+                                          </Row>
+                                        </td>
+
+                                        <td
+                                          className=" py-3"
+                                          style={{ width: "50px" }}
+                                        >
+                                          <a
+                                            href="/#"
+                                            onClick={(e) =>
+                                              showEditModal(e, list.Re_Id)
+                                            }
+                                          >
+                                            <i className="bi-pencil-square text-primary" />
+                                          </a>
+                                          <a
+                                            href="/#"
+                                            onClick={(e) =>
+                                              handleDelete(e, list.Re_Id)
+                                            }
+                                          >
+                                            <i className="bi-trash text-danger" />
+                                          </a>
+                                        </td>
+                                      </>
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </tr>
+                                ))}
+                              </>
+                            ) : (
+                              <tr className="text-center ">
+                                <td colSpan={3} className="py-3">
+                                  <h1>You don't have any receiver!</h1>
+                                </td>
+                              </tr>
+                            )}
+
+                            <tr className="text-center ">
+                              <td colSpan={3} className="py-3">
+                                <Button
+                                  variant="primary"
+                                  type="button"
+                                  onClick={() => showEditModal(null, 0)}
+                                >
+                                  <i className="bi-plus-lg" /> Add More
+                                </Button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </Table>
+                      </Tab.Pane>
+
+                      {/* -------------------------Order History------------------------------------------- */}
+
+                      <Tab.Pane
+                        eventKey="order-history"
+                        className="px-lg-5 pt-lg-2 px-sm-2 "
+                      >
+                        <h1 className="pt-lg-2 pb-3">History</h1>
+
+                        <Table
+                          responsive
+                          bordered
+                          className="bg-light bg-icon text-center "
+                        >
+                          <thead>
+                            <tr className="bg-primary align-mRe_Re_Re_Iddle">
+                              <th>Order Id</th>
+                              <th>Receiver</th>
+                              <th>Date Order</th>
+                              <th>Order Info</th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {order.length !== 0 ? (
+                              <>
+                                {order.map((list) => (
+                                  <tr key={list.ORD_Id}>
+                                    <td>{list.ORD_Code}</td>
+                                    <td>{list.ORD_Name}</td>
+                                    <td>{list.ORD_DateTime}</td>
+                                    <td>
+                                      <Row sm={1}>
+                                        <Col>View more</Col>
+                                        <Col>
+                                          <a
+                                            href="/#"
+                                            onClick={(e) =>
+                                              showOrderInfoModal(e, list.ORD_Id)
+                                            }
+                                          >
+                                            <i className="bi bi-eye-fill text-primary pe-2" />
+                                          </a>
+                                        </Col>
+                                      </Row>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </>
+                            ) : (
+                              <tr className="text-center ">
+                                <td colSpan={4} className="py-3">
+                                  <h1>You don't have any order!</h1>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </Table>
+                      </Tab.Pane>
+                    </Tab.Content>
+                  </Card>
+                </Col>
               </Row>
-            </Modal.Body>
+            </Tab.Container>
+          </CardGroup>
+        </Container>
 
-            <Modal.Footer className="bg-light bg-icon">
-              <Button variant="secondary" onClick={closeOrderInfo}>
-                Close
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </section>
-      ) : (
-        navigate("/")
-      )}
-    </>
-  );
+        {/* -------------------------Modal Default------------------------------------------- */}
+        <Modal show={defaultModal} onHide={closeDefaultModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Default Receiver</Modal.Title>
+          </Modal.Header>
+          {checkDefault.values.is_Default ? (
+            <Modal.Body>
+              <h4 className="text-center">
+                Do you want to remove the default?
+              </h4>
+            </Modal.Body>
+          ) : (
+            <Modal.Body>
+              <h4 className="text-center">
+                Do you want this receiver to be the default?
+              </h4>
+            </Modal.Body>
+          )}
+
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeDefaultModal}>
+              No
+            </Button>
+
+            <Button variant="primary" onClick={checkDefault.handleSubmit}>
+              Yes
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* -------------------------Modal Receiver (get add update delete)------------------------------------------- */}
+        <Modal show={receiverModal} onHide={closeReceiverModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Receiver
+              <small className="text-muted">
+                {checkReceiver.values.Re_Id === 0 ? " new" : " edit"}
+              </small>
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <Form>
+              <Input
+                label="name"
+                maxLength="50"
+                required
+                formField={checkReceiver.getFieldProps("name")}
+                errMessage={
+                  checkReceiver.touched.name && checkReceiver.errors.name
+                }
+              />
+              <Input
+                label="phone"
+                maxLength="50"
+                required
+                formField={checkReceiver.getFieldProps("phone")}
+                errMessage={
+                  checkReceiver.touched.phone && checkReceiver.errors.phone
+                }
+              />
+              <Input
+                label="address"
+                maxLength="50"
+                required
+                formField={checkReceiver.getFieldProps("address")}
+                errMessage={
+                  checkReceiver.touched.address && checkReceiver.errors.address
+                }
+              />
+
+              <Form.Check
+                type="switch"
+                value={checkReceiver.values.is_Default}
+                checked={checkReceiver.values.is_Default}
+                onChange={() =>
+                  checkReceiver.setFieldValue(
+                    "is_Default",
+                    checkReceiver.values.is_Default ? 0 : 1
+                  )
+                }
+              />
+            </Form>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant="secondary" onClick={closeReceiverModal}>
+              Close
+            </Button>
+
+            <CustomButton
+              type="submit"
+              color="primary"
+              disabled={isWaiting}
+              isLoading={isWaiting}
+              onClick={checkReceiver.handleSubmit}
+            >
+              Save
+            </CustomButton>
+          </Modal.Footer>
+        </Modal>
+
+        {/* -------------------------Modal Order Info------------------------------------------------- */}
+
+        <Modal
+          dialogClassName="modal-80w"
+          show={orderInfoModal}
+          onHide={closeOrderInfo}
+        >
+          <Modal.Header className="bg-light bg-icon">
+            <Modal.Title>
+              Order{" "}
+              <small className="text-muted">
+                {orderFormik.values.ORD_Code}
+              </small>
+            </Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body className="bg-light bg-icon">
+            <Row>
+              <Col>
+                <Row className="mb-3">
+                  <Col sm="3" md={6}>
+                    Receiver Name:
+                  </Col>
+                  <Col>{orderFormik.values.ORD_Name}</Col>
+                </Row>
+
+                <Row className="mb-3">
+                  <Col sm="3" md={6}>
+                    Phone:
+                  </Col>
+                  <Col>{orderFormik.values.ORD_Phone}</Col>
+                </Row>
+
+                <Row className="mb-3">
+                  <Col sm="3" lg={2}>
+                    Address:
+                  </Col>
+                  <Col>{orderFormik.values.ORD_Address}</Col>
+                </Row>
+
+                <Row className="mb-3">
+                  <Col sm="3" lg={2}>
+                    Note:
+                  </Col>
+                  <Col>{orderFormik.values.ORD_CusNote}</Col>
+                </Row>
+              </Col>
+
+              <Card as={Col} className="border-primary me-2">
+                <CardHeader as={Row} className="pt-3 pb-0">
+                  <Card.Title as={Col}>
+                    <h3>
+                      Order <small className="text-muted">list</small>
+                    </h3>
+                  </Card.Title>
+                </CardHeader>
+
+                <Card.Body>
+                  <Table
+                    striped
+                    responsive
+                    bordered
+                    hover
+                    className="text-center"
+                  >
+                    <thead>
+                      <tr className="table-primary border-primary ">
+                        <th style={{ width: "50px" }}>#</th>
+
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+
+                        <th style={{ width: "80px" }}></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </Table>
+                </Card.Body>
+              </Card>
+            </Row>
+          </Modal.Body>
+
+          <Modal.Footer className="bg-light bg-icon">
+            <Button variant="secondary" onClick={closeOrderInfo}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </section>
+    );
+  } else {
+    return navigate("/");
+  }
 };
 
 export default User;

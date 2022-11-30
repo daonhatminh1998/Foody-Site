@@ -42,11 +42,11 @@ const Login = () => {
           if (res.errorCode === 0) {
             setCartItems(
               res.data.cart_detail.map((item) => ({
-                ProDe_Id: item.ProDe_Id,
+                id: item.ProDe_Id,
                 quantity: item.CartDe_Quantity,
-                select: cartItems.find((items) =>
-                  items.id === item.ProDe_Id ? items.select : 0
-                ),
+                select:
+                  cartItems.find((items) => items.id === item.ProDe_Id)
+                    ?.select || 0,
               }))
             );
           }

@@ -2,7 +2,7 @@ import React from "react";
 import About from "../components/About";
 import Features from "../components/Features";
 import Firm from "../components/Firm";
-import OtherHeader from "../components/OtherHeader";
+import OtherHeader from "../components/header/OtherHeader";
 
 const AboutUs = () => {
   return (

@@ -2,10 +2,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
-import { useDispatch, useSelector } from "react-redux";
-import { updateInfo } from ".././store/reducers/auth";
+import { useSelector } from "react-redux";
 
-import userService from "../services/userService";
 import ProductDetailService from "../services/productDetailService";
 import cartService from "../services/cartServices";
 
@@ -204,19 +202,20 @@ export const CartProvider = ({ children }) => {
 
   //---------------------BackEnd------------------------------------------
 
-  // if (isLoggedIn) {
-  //   if (cartItems.length !== 0) {
-  //     const cart = { cartItem: cartItems };
-  //     const id = setInterval(function () {
-  //       cartService.updateCart(cart).then((res) => {
-  //         console.log(res);
-  //       });
-  //     }, 10000);
-  //     if (cartItems.length === 0) {
-  //       clearInterval(id);
-  //     }
-  //   }
-  // }
+  const [check, setCheck] = useState([cartItems]);
+
+  if (isLoggedIn) {
+    if (cartItems.length !== 0) {
+      if (check !== cartItems) {
+        const cart = { cartItem: cartItems };
+        setTimeout(function () {
+          cartService.updateCart(cart).then((res) => {
+            setCheck(cartItems);
+          });
+        }, 5000);
+      }
+    }
+  }
 
   return (
     <CartStateContext.Provider

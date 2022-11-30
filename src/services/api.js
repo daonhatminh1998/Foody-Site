@@ -4,12 +4,14 @@ import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
   baseUrl: "http://localhost/foody/",
-  // baseUrl: "https://myfoody290798.herokuapp.com/member/",
+  // baseUrl: "https://myfoody290798.herokuapp.com/",
   login: "member/login",
   changePassword: "member/changePassword",
   changeInfor: "member/changeInfor",
 
   carts: "member/carts",
+  updateCart: "member/updateCart",
+
   addQuantity: "member/addQuantity",
   deleteItem: "member/deleteItem",
   deleteAll: "member/deleteAll",
@@ -22,13 +24,15 @@ const url = {
   updateReceiver: "member/updateReceiver",
   deleteReceiver: "member/deleteReceiver",
 
-  order: "member/sorder",
-
   products: "api/products",
   productDetail: "api/productDetail",
 
   orderCus: "api/orderCus",
   orderCusDetail: "api/orderCusDetail",
+
+  orderMem: "api/orderMem",
+  order: "member/order",
+  orderMemDetail: "api/orderMemDetail",
 };
 
 const instance = axios.create({

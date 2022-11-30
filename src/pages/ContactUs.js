@@ -1,5 +1,5 @@
 import React from "react";
-import OtherHeader from "../components/OtherHeader";
+import OtherHeader from "../components/header/OtherHeader";
 import {
   faFacebook,
   faLinkedinIn,
