@@ -25,11 +25,15 @@ export const CartProvider = ({ children }) => {
   //---------------------Product List------------------------------------------
   const RECORDS_PER_PAGE = 6;
   const [productDetail, setProductDetail] = useState([]);
+  const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [pageLength] = useState(RECORDS_PER_PAGE);
   const [pagingItems, setPagingItems] = useState([]);
 
   const loadData = () => {
+    ProductDetailService.list().then((res) => {
+      setItems(res.data);
+    });
     ProductDetailService.getPaging(page, pageLength).then((res) => {
       setProductDetail(res.data);
 
@@ -110,23 +114,21 @@ export const CartProvider = ({ children }) => {
 
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const userInfo = useSelector((state) => state.auth.userInfo);
-  const dispatch = useDispatch();
-
   const cartQuantity = cartItems.reduce(
     (quantity, item) => item.quantity + quantity,
     0
   );
 
-  function getItemQuantity(ProDe_Id) {
-    return cartItems.find((item) => item.ProDe_Id === ProDe_Id)?.quantity || 0;
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+  function getItemQuantity(id) {
+    return cartItems.find((item) => item.id === id)?.quantity || 0;
   }
 
-  function selectItem(ProDe_Id, select) {
+  function selectItem(id, select) {
     setCartItems((currItems) => {
       return currItems.map((item) => {
-        if (item.ProDe_Id === ProDe_Id && item.select !== select) {
+        if (item.id === id && item.select !== select) {
           return { ...item, select: select };
         } else {
           return item;
@@ -135,16 +137,16 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function increaseCartQuantity(ProDe_Id) {
+  function increaseCartQuantity(id) {
     setCartItems((currItems) => {
-      if (currItems.find((item) => item.ProDe_Id === ProDe_Id) == null) {
+      if (currItems.find((item) => item.id === id) == null) {
         if (isLoggedIn) {
-          cartService.addQuantity(ProDe_Id);
+          cartService.addQuantity(id);
         }
-        return [...currItems, { ProDe_Id, quantity: 1, select: 0 }];
+        return [...currItems, { id, quantity: 1, select: 0 }];
       } else {
         return currItems.map((item) => {
-          if (item.ProDe_Id === ProDe_Id) {
+          if (item.id === id) {
             return { ...item, quantity: item.quantity + 1 };
           } else {
             return item;
@@ -154,15 +156,13 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function decreaseCartQuantity(ProDe_Id) {
+  function decreaseCartQuantity(id) {
     setCartItems((currItems) => {
-      if (
-        currItems.find((item) => item.ProDe_Id === ProDe_Id)?.quantity === 1
-      ) {
+      if (currItems.find((item) => item.id === id)?.quantity === 1) {
         return currItems;
       } else {
         return currItems.map((item) => {
-          if (item.ProDe_Id === ProDe_Id) {
+          if (item.id === id) {
             return { ...item, quantity: item.quantity - 1 };
           } else {
             return item;
@@ -172,12 +172,12 @@ export const CartProvider = ({ children }) => {
     });
   }
 
-  function removeFromCart(ProDe_Id) {
+  function removeFromCart(id) {
     setCartItems((currItems) => {
       if (isLoggedIn) {
-        cartService.deleteItem(ProDe_Id);
+        cartService.deleteItem(id);
       }
-      return currItems.filter((item) => item.ProDe_Id !== ProDe_Id);
+      return currItems.filter((item) => item.id !== id);
     });
   }
 
@@ -186,7 +186,7 @@ export const CartProvider = ({ children }) => {
     cartItems.map((item) =>
       !item.select
         ? removeItem.push({
-            ProDe_Id: item.ProDe_Id,
+            id: item.id,
             quantity: item.quantity,
             select: item.select,
           })
@@ -221,8 +221,10 @@ export const CartProvider = ({ children }) => {
   return (
     <CartStateContext.Provider
       value={{
+        items,
         pagingItems,
         productDetail,
+
         openCart,
         closeCart,
 
@@ -232,7 +234,6 @@ export const CartProvider = ({ children }) => {
         removeItem,
         clearCart,
 
-        getItem,
         getItemQuantity,
         selectItem,
         increaseCartQuantity,

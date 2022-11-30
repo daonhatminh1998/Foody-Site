@@ -28,6 +28,7 @@ import { updateInfo } from ".././../store/reducers/auth";
 import CustomButton from "../CustomButton";
 import Input from "../Input";
 import { Item } from "./ItemSelect";
+import { Navigate } from "react-router-dom";
 
 export function ShoppingCart({ isOpen }) {
   const { closeCart, cartItems, productDetail, clearCart, removeItem } =
@@ -225,7 +226,7 @@ export function ShoppingCart({ isOpen }) {
 
     onSubmit: (values) => {
       cusOrderSubmit(values);
-      // formik.resetForm();
+      formik.resetForm();
     },
   });
 
@@ -234,7 +235,7 @@ export function ShoppingCart({ isOpen }) {
     cartItems.map((item) =>
       item.select
         ? details.push({
-            ProDe_Id: item.id,
+            id: item.id,
             ORDe_Quantity: item.quantity,
           })
         : 0
@@ -252,6 +253,7 @@ export function ShoppingCart({ isOpen }) {
     };
 
     orderCusServices.add(order).then((res) => {
+      console.log(res);
       if (res.errorCode === 0) {
         toast.success("Order submitted");
         clearCart();
@@ -260,7 +262,7 @@ export function ShoppingCart({ isOpen }) {
         closeCustomerModal();
 
         // localStorage.removeItem("shopping-cart");
-        // navigate("/", window.scrollTo(0, 0));
+        Navigate("/", window.scrollTo(0, 0));
       } else {
         toast.error(res.message);
       }
@@ -347,8 +349,7 @@ export function ShoppingCart({ isOpen }) {
                   {formatCurrency(
                     cartItems.reduce((total, cartItem) => {
                       const item = productDetail.find(
-                        (i) =>
-                          i.ProDe_Id === cartItem.id && cartItem.select === 1
+                        (i) => i.id === cartItem.id && cartItem.select === 1
                       );
                       return total + (item?.Pro_Price || 0) * cartItem.quantity;
                     }, 0)
@@ -793,7 +794,10 @@ export function ShoppingCart({ isOpen }) {
                 type="submit"
                 variant="primary"
                 disabled={!formik.dirty || !formik.isValid}
-                onClick={showOrderModal}
+                onClick={() => {
+                  showOrderModal();
+                  closeCustomerModal();
+                }}
               >
                 Confirm
               </Button>
@@ -893,7 +897,7 @@ export function ShoppingCart({ isOpen }) {
               )}
 
               {userInfo.cart.cart_detail.map((item) => (
-                <div key={item.ProDe_Id}>
+                <div key={item.id}>
                   {item.is_Selected ? (
                     <>
                       <Row className="d-flex align-items-center p-2 bg-light ">

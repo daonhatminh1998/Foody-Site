@@ -2,30 +2,27 @@ import { Button, Col, Row, Image, Form } from "react-bootstrap";
 import { useCart } from "../../store/Cart";
 import formatCurrency from "../../utilities/formatCurrency";
 
-export function CartItem({ ProDe_Id, quantity, select }) {
+export function CartItem({ id, quantity, select }) {
   const {
-    productDetail,
+    items,
     selectItem,
     increaseCartQuantity,
     decreaseCartQuantity,
     removeFromCart,
   } = useCart();
 
-  const item = productDetail.find((i) => i.ProDe_Id === ProDe_Id);
+  const item = items.find((i) => i.ProDe_Id === id);
   if (!item) return null;
 
   return (
     <>
-      <Row
-        key={item.ProDe_Id}
-        className="d-flex align-items-center p-2 bg-light "
-      >
+      <Row key={item.id} className="d-flex align-items-center p-2 bg-light ">
         <Col sm="auto" className="p-0 pe-2 text-start">
           <Form.Check
             type="checkbox"
             checked={select}
             onChange={() => {
-              selectItem(ProDe_Id, select ? 0 : 1);
+              selectItem(id, select ? 0 : 1);
             }}
           />
         </Col>
@@ -47,7 +44,7 @@ export function CartItem({ ProDe_Id, quantity, select }) {
                 <Col>
                   <Button
                     variant="warning"
-                    onClick={() => decreaseCartQuantity(ProDe_Id)}
+                    onClick={() => decreaseCartQuantity(id)}
                   >
                     -
                   </Button>
@@ -55,16 +52,13 @@ export function CartItem({ ProDe_Id, quantity, select }) {
                 <Col>
                   <Button
                     variant="primary"
-                    onClick={() => increaseCartQuantity(ProDe_Id)}
+                    onClick={() => increaseCartQuantity(id)}
                   >
                     +
                   </Button>
                 </Col>
                 <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => removeFromCart(ProDe_Id)}
-                  >
+                  <Button variant="danger" onClick={() => removeFromCart(id)}>
                     &times;
                   </Button>
                 </Col>

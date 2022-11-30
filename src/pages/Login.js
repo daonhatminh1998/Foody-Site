@@ -44,6 +44,9 @@ const Login = () => {
               res.data.cart_detail.map((item) => ({
                 ProDe_Id: item.ProDe_Id,
                 quantity: item.CartDe_Quantity,
+                select: cartItems.find((items) =>
+                  items.id === item.ProDe_Id ? items.select : 0
+                ),
               }))
             );
           }
