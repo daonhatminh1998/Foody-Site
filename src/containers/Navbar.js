@@ -14,7 +14,7 @@ import { useSelector } from "react-redux/es/exports";
 import { useDispatch } from "react-redux";
 
 const Navbars = () => {
-  const { openCart, cartQuantity } = useCart();
+  const { openCart, cartQuantity, setCartItems } = useCart();
   const [expanded, setExpanded] = useState(false);
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -91,7 +91,7 @@ const Navbars = () => {
                       {userInfo.name}
                     </Link>
                     <i
-                      onClick={() => dispatch(logout())}
+                      onClick={() => dispatch(logout(), setCartItems([]))}
                       className="bi-box-arrow-right text-primary ms-2"
                     />
                   </Nav.Item>

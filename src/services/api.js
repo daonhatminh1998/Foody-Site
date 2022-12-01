@@ -6,6 +6,7 @@ const url = {
   baseUrl: "http://localhost/foody/",
   // baseUrl: "https://myfoody290798.herokuapp.com/",
   login: "member/login",
+  register: "member/register",
   changePassword: "member/changePassword",
   changeInfor: "member/changeInfor",
 
@@ -30,8 +31,7 @@ const url = {
   orderCus: "api/orderCus",
   orderCusDetail: "api/orderCusDetail",
 
-  orderMem: "api/orderMem",
-  order: "member/order",
+  orderMem: "member/orderMem",
   orderMemDetail: "api/orderMemDetail",
 };
 

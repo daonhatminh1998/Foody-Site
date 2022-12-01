@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import CardHeader from "react-bootstrap/esm/CardHeader";
-import { Card, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Row } from "react-bootstrap";
 
 import userService from "../services/userService";
-import cartService from "../services/cartServices";
+import cartService from "../services/cartService";
 import { login } from "../store/reducers/auth";
 
 import Input from "../components/Input";
@@ -77,7 +77,16 @@ const Login = () => {
             <Card bg="primary">
               <CardHeader className=" bg-primary">
                 <Card.Title className="mb-0">
-                  <i className="bi-grid-3x3-gap-fill" /> Login
+                  <Row>
+                    <Col className="align-self-center">
+                      <i className="bi-grid-3x3-gap-fill" /> Login
+                    </Col>
+                    <Col className="p-0 text-end">
+                      <CustomButton type="button" onClick={handleBack}>
+                        <i className="fa fa-times" />
+                      </CustomButton>
+                    </Col>
+                  </Row>
                 </Card.Title>
               </CardHeader>
 
@@ -89,7 +98,7 @@ const Login = () => {
                     id="txtUserName"
                     autoComplete="off"
                     maxLength="50"
-                    label="User name"
+                    label="Username"
                     placeholder="Enter user name"
                   />
                   <Input
@@ -103,21 +112,16 @@ const Login = () => {
                   <CustomButton
                     type="submit"
                     color="primary"
-                    className="me-2"
+                    className="me-2 py-2 px-3 "
                     disabled={isWaiting}
                     isLoading={isWaiting}
                   >
-                    Sign in
+                    Sign In
                   </CustomButton>
 
-                  <CustomButton
-                    type="button"
-                    color="primary"
-                    className="px-3"
-                    onClick={handleBack}
-                  >
-                    Back
-                  </CustomButton>
+                  <Button as={NavLink} to="/SignUp" color="primary">
+                    Sign Up
+                  </Button>
                 </Form>
               </Card.Body>
             </Card>

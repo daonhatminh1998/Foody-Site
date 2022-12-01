@@ -12,11 +12,13 @@ import {
   Table,
   Button,
   Modal,
+  Pagination,
 } from "react-bootstrap";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+
+import formatCurrency from "../utilities/formatCurrency";
 
 import { logout, updateInfo } from ".././store/reducers/auth";
 
@@ -30,33 +32,17 @@ import { toast } from "react-toastify";
 import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";
 import CardHeader from "react-bootstrap/esm/CardHeader";
+import { useCart } from "../store/Cart";
 
 const User = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
+  const { receiver, order, loadData, setCartItems, orderPagingItems } =
+    useCart();
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
-
-  const [receiver, setReceiver] = useState([]);
-  const [order, setOrder] = useState([]);
-
-  const loadData = () => {
-    if (isLoggedIn) {
-      receiverService.list().then((res) => {
-        setReceiver(res.data);
-      });
-
-      orderMemService.list().then((res) => {
-        setOrder(res.data);
-      });
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  });
 
   //-------------------------Change Password-------------------------------------------
   const passwordRef = React.useRef();
@@ -76,7 +62,7 @@ const User = () => {
       confirmPassword: Yup.string()
         .required("Required")
         .min(6)
-        .oneOf([Yup.ref("newPassword")], "Your new password do not match."),
+        .oneOf([Yup.ref("newPassword")], "Your new password does not match."),
     }),
 
     onSubmit: (values) => {
@@ -98,8 +84,9 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Change password successful");
           formik.resetForm();
-          navigate("Login", window.scrollTo(0, 0));
+          navigate("/Login", window.scrollTo(0, 0));
           dispatch(logout());
+          setCartItems([]);
         } else {
           toast.error(res.message);
         }
@@ -294,20 +281,14 @@ const User = () => {
 
   const orderFormik = useFormik({
     initialValues: {
-      ORD_Re_Re_Re_Id: 0,
+      ORD_Id: 0,
       ORD_Code: "",
       ORD_Name: "",
       ORD_Address: "",
       ORD_Phone: "",
       ORD_CusNote: "",
-      details: "",
+      details: [],
     },
-
-    // validationSchema: Yup.object({
-    //   name: Yup.string().required("Required"),
-    //   phone: Yup.string().required("Required"),
-    //   address: Yup.string().required("Required"),
-    // }),
 
     onSubmit: (values) => {
       orderFormik(values);
@@ -320,6 +301,7 @@ const User = () => {
     orderMemService.get(ORD_Id).then((res) => {
       if (res.errorCode === 0) {
         orderFormik.setValues(res.data);
+
         showOrderInfo();
       }
     });
@@ -336,7 +318,7 @@ const User = () => {
                   <Card className="profile-tab-nav rounded-5 border-0">
                     <Card.Img
                       src={userInfo.bgimg}
-                      className=" img-fluRe_Re_Re_Id rounded-4"
+                      className=" img-fluid rounded-4"
                     />
                     <Card.ImgOverlay>
                       <div className="img-circle text-center mb-3">
@@ -580,7 +562,7 @@ const User = () => {
                                   changeInfo.errors.name
                                 }
                               />
-                              <Form.Control.Feedback type="invalRe_Re_Re_Id">
+                              <Form.Control.Feedback type="invalid">
                                 {changeInfo.errors.name}
                               </Form.Control.Feedback>
                             </Col>
@@ -609,7 +591,7 @@ const User = () => {
                                   changeInfo.errors.email
                                 }
                               />
-                              <Form.Control.Feedback type="invalRe_Re_Re_Id">
+                              <Form.Control.Feedback type="invalid">
                                 {changeInfo.errors.email}
                               </Form.Control.Feedback>
                             </Col>
@@ -795,7 +777,7 @@ const User = () => {
                           className="bg-light bg-icon text-center "
                         >
                           <thead>
-                            <tr className="bg-primary align-mRe_Re_Re_Iddle">
+                            <tr className="bg-primary align-middle">
                               <th>Order Id</th>
                               <th>Receiver</th>
                               <th>Date Order</th>
@@ -838,6 +820,9 @@ const User = () => {
                             )}
                           </tbody>
                         </Table>
+                        <Pagination className="mt-3 mb-0 justify-content-end">
+                          {orderPagingItems}
+                        </Pagination>
                       </Tab.Pane>
                     </Tab.Content>
                   </Card>
@@ -952,7 +937,7 @@ const User = () => {
         {/* -------------------------Modal Order Info------------------------------------------------- */}
 
         <Modal
-          dialogClassName="modal-80w"
+          dialogClassName="modal-90w"
           show={orderInfoModal}
           onHide={closeOrderInfo}
         >
@@ -967,7 +952,7 @@ const User = () => {
 
           <Modal.Body className="bg-light bg-icon">
             <Row>
-              <Col>
+              <Col sm={6} lg={4}>
                 <Row className="mb-3">
                   <Col sm="3" md={6}>
                     Receiver Name:
@@ -1014,6 +999,7 @@ const User = () => {
                     hover
                     className="text-center"
                   >
+                    <caption>List of Items</caption>
                     <thead>
                       <tr className="table-primary border-primary ">
                         <th style={{ width: "50px" }}>#</th>
@@ -1021,12 +1007,34 @@ const User = () => {
                         <th>Product Name</th>
                         <th>Quantity</th>
                         <th>Price</th>
-                        <th>Total</th>
-
-                        <th style={{ width: "80px" }}></th>
                       </tr>
                     </thead>
-                    <tbody></tbody>
+                    <tbody>
+                      {orderFormik.values.details.map((list, index) => (
+                        <tr key={list.ORDe_Id}>
+                          <td>{index + 1}</td>
+                          <td>{list.product_detail.Pro_Name}</td>
+                          <td>{list.ORDe_Quantity}</td>
+                          <td>{formatCurrency(list.ORDe_Price)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colSpan={3} className="text-center">
+                          Total:
+                        </td>
+                        <td>
+                          {formatCurrency(
+                            orderFormik.values.details.reduce(
+                              (total, list) =>
+                                (total = total + list.ORDe_Price),
+                              0
+                            )
+                          )}
+                        </td>
+                      </tr>
+                    </tfoot>
                   </Table>
                 </Card.Body>
               </Card>

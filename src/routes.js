@@ -1,4 +1,5 @@
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import BlogGrid from "./pages/BlogGrid";
@@ -13,6 +14,7 @@ import User from "./pages/User";
 const routes = [
   { path: "/", component: <HomePage /> },
   { path: "/Login", component: <Login /> },
+  { path: "/SignUp", component: <SignUp /> },
   { path: "/HomePage", component: <HomePage /> },
   { path: "/AboutUs", component: <AboutUs /> },
   { path: "/BlogGrid", component: <BlogGrid /> },

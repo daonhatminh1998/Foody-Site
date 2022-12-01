@@ -14,7 +14,7 @@ const deleteItem = (ProDe_Id) => {
 
 const deleteAll = () => api.delete(api.url.deleteAll);
 
-const cartServices = {
+const cartService = {
   listCart,
   updateCart,
   addQuantity,
@@ -22,4 +22,4 @@ const cartServices = {
   deleteAll,
 };
 
-export default cartServices;
+export default cartService;

@@ -3,7 +3,6 @@ import {
   Card,
   Col,
   Form,
-  Image,
   Modal,
   Offcanvas,
   Row,
@@ -21,36 +20,29 @@ import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import receiverService from "../../services/receiverService";
-import orderMemService from "../../services/orderMemService";
 
 import CustomButton from "../CustomButton";
 import Input from "../Input";
 import { Item } from "./ItemSelect";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import orderMemService from "../../services/orderMemService";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, items, clearCart, removeItem } = useCart();
+  const {
+    closeCart,
+    cartItems,
+    items,
+    clearCart,
+    removeItem,
+    receiver,
+    loadData,
+  } = useCart();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isWaiting, setIsWaiting] = useState(false);
-
-  const [receiver, setReceiver] = useState([]);
-
-  const loadData = () => {
-    if (isLoggedIn) {
-      receiverService.list().then((res) => {
-        setReceiver(res.data);
-      });
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  });
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
@@ -177,8 +169,8 @@ export function ShoppingCart({ isOpen }) {
           if (res.data.is_Default && res.data.is_Chosen) {
             checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
           }
-
           loadData();
+
           closeReceiverFunctionModal();
         } else {
           toast.error(res.message);
@@ -214,9 +206,8 @@ export function ShoppingCart({ isOpen }) {
         if (res.data) {
           setReceiverOrder([]);
         }
-
-        toast.success("Delete Successful");
         loadData();
+        toast.success("Delete Successful");
       } else {
         toast.error(res.message);
       }
@@ -247,9 +238,8 @@ export function ShoppingCart({ isOpen }) {
       setIsWaiting(false);
       if (res.errorCode === 0) {
         toast.success("Select Successful");
-
-        setReceiverOrder(res.data);
         loadData();
+        setReceiverOrder(res.data);
 
         closeReceiverModal();
         showOrderModal();
@@ -266,14 +256,17 @@ export function ShoppingCart({ isOpen }) {
   const showOrderModal = () => setOrderModal(true);
 
   const resetReceiver = () => {
-    if (isLoggedIn) {
-      receiverService.reset().then((res) => {
-        if (res.errorCode === 0) {
-          loadData();
-          showOrderModal();
+    receiverService.reset().then((res) => {
+      if (res.errorCode === 0) {
+        if (res.data) {
+          setReceiverOrder(res.data);
+        } else {
+          setReceiverOrder([]);
         }
-      });
-    }
+        loadData();
+        showOrderModal();
+      }
+    });
   };
 
   const order = useFormik({
@@ -283,40 +276,41 @@ export function ShoppingCart({ isOpen }) {
 
     onSubmit: (values) => {
       orderSubmit(values);
-      order.resetForm();
+      // order.resetForm();
     },
   });
 
-  const orderSubmit = (e) => {
-    if (e) e.preventDefault();
-
+  const orderSubmit = (data) => {
     const details = [];
     cartItems.map((item) =>
       item.select
         ? details.push({
             id: item.id,
-            ORDe_Quantity: item.quantity,
+            quantity: item.quantity,
           })
         : 0
     );
 
     const order = {
       Re_Id: receiverOrder.Re_Id,
-      ORD_CusNote: "",
+      ORD_CusNote: data.ORD_CusNote,
       details: details,
     };
 
-    console.log(order);
-    // orderMemService.order(order).then((res) => {
-    //   if (res.errorCode === 0) {
-    //     loadData();
-    //     toast.success("Order submitted");
+    // const cart = { cartItem: cartItems };
+    // cartService.updateCart(cart);
 
-    //     removeItem();
-    //     closeOrderModal();
-    //     navigate("/", window.scrollTo(0, 0));
-    //   }
-    // });
+    orderMemService.order(order).then((res) => {
+      console.log(res);
+      if (res.errorCode === 0) {
+        toast.success("Order submitted");
+        loadData();
+        removeItem();
+        closeOrderModal();
+        closeCustomerModal();
+        navigate("/", window.scrollTo(0, 0));
+      }
+    });
   };
 
   return (
@@ -366,9 +360,7 @@ export function ShoppingCart({ isOpen }) {
 
             <Button
               onClick={() =>
-                isLoggedIn
-                  ? (resetReceiver(), showCustomerModal())
-                  : showCustomerModal()
+                isLoggedIn ? resetReceiver() : showCustomerModal()
               }
               disabled={
                 !cartItems.reduce((count, cartItem) => {
@@ -923,7 +915,7 @@ export function ShoppingCart({ isOpen }) {
             <Button
               type="submit"
               variant="primary"
-              onClick={formik.handleSubmit}
+              onClick={order.handleSubmit}
             >
               Confirm
             </Button>
