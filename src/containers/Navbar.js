@@ -44,6 +44,7 @@ const Navbars = () => {
         onClick={() => setExpanded(expanded ? false : "expanded")}
         className="me-4"
       />
+
       <Navbar.Collapse onClick={() => setExpanded(false)}>
         <Nav className="ms-auto p-4 p-lg-0 h4 bg-light">
           <Row
