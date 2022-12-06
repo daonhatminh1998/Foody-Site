@@ -99,7 +99,7 @@ export function ShoppingCart({ isOpen }) {
       },
       details: details,
     };
-
+    console.log(order);
     orderCusService.add(order).then((res) => {
       console.log(res);
       if (res.errorCode === 0) {
