@@ -101,7 +101,7 @@ export function ShoppingCart({ isOpen }) {
     };
 
     orderCusService.add(order).then((res) => {
-      // console.log(res);
+      console.log(res);
       if (res.errorCode === 0) {
         toast.success("Order submitted");
 

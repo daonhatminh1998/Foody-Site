@@ -3,8 +3,8 @@ import store from "../store";
 import { hideLoading, showLoading } from "react-redux-loading-bar";
 
 const url = {
-  // baseUrl: "https://foody-shop.great-site.net/",
-  baseUrl: "https://myfoody290798.herokuapp.com/",
+  baseUrl: "http://localhost/foody/",
+  // baseUrl: "https://myfoody290798.herokuapp.com/",
   login: "member/login",
   register: "member/register",
   changePassword: "member/changePassword",
