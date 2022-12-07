@@ -59,6 +59,7 @@ export function ShoppingCart({ isOpen }) {
       ORD_Address: "",
       Cus_Email: "",
       Cus_Phone: "",
+      ORD_CusNote: "",
     },
 
     validationSchema: Yup.object({
@@ -99,18 +100,17 @@ export function ShoppingCart({ isOpen }) {
       },
       details: details,
     };
-    console.log(order);
+
     orderCusService.add(order).then((res) => {
-      console.log(res);
       if (res.errorCode === 0) {
         toast.success("Order submitted");
 
         removeItem();
         closeOrderModal();
         closeCustomerModal();
+        navigate("/", window.scrollTo(0, 0));
 
         // localStorage.removeItem("shopping-cart");
-        navigate("/", window.scrollTo(0, 0));
       } else {
         toast.error(res.message);
       }
