@@ -7,7 +7,6 @@ import { useSelector } from "react-redux";
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
 
 import useLocalStorage from "./hooks/useLocalStorage";
-import receiverService from "../services/receiverService";
 import orderMemService from "../services/orderMemService";
 import ProductDetailService from "../services/productDetailService";
 import cartService from "../services/cartService";
@@ -25,7 +24,7 @@ export const CartProvider = ({ children }) => {
   //---------------------Product List------------------------------------------
 
   const [items, setItems] = useState([]);
-  const [receiver, setReceiver] = useState([]);
+  // const [receiver, setReceiver] = useState([]);
 
   const [productDetail, setProductDetail] = useState([]);
   const [page, setPage] = useState(0);
@@ -41,37 +40,32 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
   const [check, setCheck] = useState([cartItems]);
 
-  const loadData = () => {
+  if (isLoggedIn) {
+    if (cartItems.length !== 0 && check !== cartItems) {
+      const cart = { cartItem: cartItems };
+      setTimeout(function () {
+        cartService.updateCart(cart).then((res) => {
+          setCheck(cartItems);
+        });
+      }, 10000);
+    }
+  }
+
+  const loadOrder = () => {
     if (isLoggedIn) {
-      if (cartItems.length !== 0 && check !== cartItems) {
-        const cart = { cartItem: cartItems };
-        setTimeout(function () {
-          cartService.updateCart(cart).then((res) => {
-            setCheck(cartItems);
-          });
-        }, 10000);
-      }
-
-      receiverService.list().then((res) => {
-        setReceiver(res.data);
-      });
-
       orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
         setOrder(res.data);
-
         const last = res.pagingInfo.totalPages - 1;
         var left = orderPage - 2,
           right = orderPage + 2 + 1,
           range = [],
           rangeWithDots = [];
         let l;
-
         for (let i = 0; i <= last; i++) {
           if (i === 0 || i === last || (i >= left && i < right)) {
             range.push(i);
           }
         }
-
         //mũi tên
         if (res.pagingInfo.totalPages > 0) {
           rangeWithDots = [
@@ -87,7 +81,6 @@ export const CartProvider = ({ children }) => {
             />,
           ];
         }
-
         for (let i of range) {
           if (l) {
             if (i - l === 4) {
@@ -96,7 +89,6 @@ export const CartProvider = ({ children }) => {
               rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
             }
           }
-
           rangeWithDots.push(
             <Pagination.Item
               key={i}
@@ -108,9 +100,7 @@ export const CartProvider = ({ children }) => {
           );
           l = i;
         }
-
         //mũi tên cuối
-
         rangeWithDots.push(
           <Pagination.Next
             key="Next"
@@ -123,11 +113,11 @@ export const CartProvider = ({ children }) => {
             onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
           />
         );
-
         setOrderPagingItems(rangeWithDots);
       });
     }
-
+  };
+  const loadData = () => {
     ProductDetailService.list().then((res) => {
       setItems(res.data);
     });
@@ -206,6 +196,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     loadData();
+    loadOrder();
   }, [page, pageLength, orderPage, orderPageLength]);
 
   //---------------------FrontEnd------------------------------------------
@@ -297,7 +288,6 @@ export const CartProvider = ({ children }) => {
       value={{
         items,
         loadData,
-        receiver,
 
         order,
         orderPagingItems,

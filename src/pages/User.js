@@ -33,13 +33,25 @@ import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import { useCart } from "../store/Cart";
+import { useEffect } from "react";
 
 const User = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
-  const { receiver, order, loadData, setCartItems, orderPagingItems } =
-    useCart();
+  const { order, orderPagingItems } = useCart();
+
+  const [receiver, setReceiver] = useState([]);
+
+  const loadReceiver = () => {
+    receiverService.list().then((res) => {
+      setReceiver(res.data);
+    });
+  };
+
+  useEffect(() => {
+    loadReceiver();
+  }, []);
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
@@ -86,7 +98,7 @@ const User = () => {
           formik.resetForm();
           navigate("/Login", window.scrollTo(0, 0));
           dispatch(logout());
-          setCartItems([]);
+          // setCartItems([]);
         } else {
           toast.error(res.message);
         }
@@ -181,7 +193,7 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Add Successful");
 
-          loadData();
+          loadReceiver();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -195,7 +207,7 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Update Successful");
 
-          loadData();
+          loadReceiver();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -229,7 +241,7 @@ const User = () => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
 
-        loadData();
+        loadReceiver();
       } else {
         toast.error(res.message);
       }
@@ -265,7 +277,7 @@ const User = () => {
     receiverService.defaultReceiver(data.Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Change Successful");
-        loadData();
+        loadReceiver();
 
         closeDefaultModal();
       } else {

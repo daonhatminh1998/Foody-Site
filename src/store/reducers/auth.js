@@ -20,6 +20,7 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.token = null;
       state.userInfo = {};
+      state.cartInfo = {};
     },
 
     cart: (state, action) => {

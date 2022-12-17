@@ -28,21 +28,28 @@ import Input from "../Input";
 import { Item } from "./ItemSelect";
 import { useNavigate } from "react-router-dom";
 import orderMemService from "../../services/orderMemService";
+import { useEffect } from "react";
 
 export function ShoppingCart({ isOpen }) {
-  const {
-    closeCart,
-    cartItems,
-    items,
-    clearCart,
-    removeItem,
-    receiver,
-    loadData,
-  } = useCart();
+  const { closeCart, cartItems, items, clearCart, removeItem, loadData } =
+    useCart();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isWaiting, setIsWaiting] = useState(false);
+
+  const [receiver, setReceiver] = useState([]);
+  const loadReceiver = () => {
+    if (isLoggedIn) {
+      receiverService.list().then((res) => {
+        setReceiver(res.data);
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadReceiver();
+  }, []);
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
@@ -152,7 +159,7 @@ export function ShoppingCart({ isOpen }) {
         if (res.errorCode === 0) {
           toast.success("Add Successful");
           checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
-          loadData();
+          loadReceiver();
 
           closeReceiverFunctionModal();
         } else {
@@ -206,7 +213,7 @@ export function ShoppingCart({ isOpen }) {
         if (res.data) {
           setReceiverOrder([]);
         }
-        loadData();
+        loadReceiver();
         toast.success("Delete Successful");
       } else {
         toast.error(res.message);
@@ -238,7 +245,7 @@ export function ShoppingCart({ isOpen }) {
       setIsWaiting(false);
       if (res.errorCode === 0) {
         toast.success("Select Successful");
-        loadData();
+        loadReceiver();
         setReceiverOrder(res.data);
 
         closeReceiverModal();
