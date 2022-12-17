@@ -234,9 +234,6 @@ export const CartProvider = ({ children }) => {
   function increaseCartQuantity(id) {
     setCartItems((currItems) => {
       if (currItems.find((item) => item.id === id) == null) {
-        if (isLoggedIn) {
-          cartService.addQuantity(id);
-        }
         return [...currItems, { id, quantity: 1, select: 0 }];
       } else {
         return currItems.map((item) => {
@@ -268,9 +265,6 @@ export const CartProvider = ({ children }) => {
 
   function removeFromCart(id) {
     setCartItems((currItems) => {
-      if (isLoggedIn) {
-        cartService.deleteItem(id);
-      }
       return currItems.filter((item) => item.id !== id);
     });
   }

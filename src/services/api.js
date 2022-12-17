@@ -12,9 +12,6 @@ const url = {
 
   carts: "member/carts",
   updateCart: "member/updateCart",
-
-  addQuantity: "member/addQuantity",
-  deleteItem: "member/deleteItem",
   deleteAll: "member/deleteAll",
 
   receiver: "member/receiver",
