@@ -31,8 +31,7 @@ import orderMemService from "../../services/orderMemService";
 import { useEffect } from "react";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, items, clearCart, removeItem, loadData } =
-    useCart();
+  const { closeCart, cartItems, items, clearCart, removeItem } = useCart();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -42,14 +41,16 @@ export function ShoppingCart({ isOpen }) {
   const loadReceiver = () => {
     if (isLoggedIn) {
       receiverService.list().then((res) => {
-        setReceiver(res.data);
+        if (res.errorCode === 0) {
+          setReceiver(res.data);
+        }
       });
     }
   };
 
   useEffect(() => {
     loadReceiver();
-  }, []);
+  });
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
@@ -176,7 +177,7 @@ export function ShoppingCart({ isOpen }) {
           if (res.data.is_Default && res.data.is_Chosen) {
             checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
           }
-          loadData();
+          loadReceiver();
 
           closeReceiverFunctionModal();
         } else {
@@ -270,7 +271,7 @@ export function ShoppingCart({ isOpen }) {
         } else {
           setReceiverOrder([]);
         }
-        loadData();
+        loadReceiver();
         showOrderModal();
       }
     });
@@ -311,7 +312,7 @@ export function ShoppingCart({ isOpen }) {
       console.log(res);
       if (res.errorCode === 0) {
         toast.success("Order submitted");
-        loadData();
+
         removeItem();
         closeOrderModal();
         closeCustomerModal();

@@ -45,159 +45,161 @@ export const CartProvider = ({ children }) => {
       const cart = { cartItem: cartItems };
       setTimeout(function () {
         cartService.updateCart(cart).then((res) => {
-          setCheck(cartItems);
+          if (res.errorCode === 0) {
+            setCheck(cartItems);
+          }
         });
       }, 10000);
     }
   }
 
-  const loadOrder = () => {
-    if (isLoggedIn) {
-      orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
-        setOrder(res.data);
-        const last = res.pagingInfo.totalPages - 1;
-        var left = orderPage - 2,
-          right = orderPage + 2 + 1,
-          range = [],
-          rangeWithDots = [];
-        let l;
-        for (let i = 0; i <= last; i++) {
-          if (i === 0 || i === last || (i >= left && i < right)) {
-            range.push(i);
-          }
-        }
-        //mũi tên
-        if (res.pagingInfo.totalPages > 0) {
-          rangeWithDots = [
-            <Pagination.First
-              key="frist"
-              disabled={orderPage === 0}
-              onClick={() => setOrderPage(0)}
-            />,
-            <Pagination.Prev
-              key="Previous"
-              disabled={orderPage === 0}
-              onClick={() => setOrderPage(res.pagingInfo.page - 1)}
-            />,
-          ];
-        }
-        for (let i of range) {
-          if (l) {
-            if (i - l === 4) {
-              rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
-            } else if (i - l !== 1) {
-              rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
-            }
-          }
-          rangeWithDots.push(
-            <Pagination.Item
-              key={i}
-              active={i === orderPage}
-              onClick={() => setOrderPage(i)}
-            >
-              {i + 1}
-            </Pagination.Item>
-          );
-          l = i;
-        }
-        //mũi tên cuối
-        rangeWithDots.push(
-          <Pagination.Next
-            key="Next"
-            disabled={orderPage === res.pagingInfo.totalPages - 1}
-            onClick={() => setOrderPage(res.pagingInfo.page + 1)}
-          />,
-          <Pagination.Last
-            key="last"
-            disabled={orderPage === res.pagingInfo.totalPages - 1}
-            onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
-          />
-        );
-        setOrderPagingItems(rangeWithDots);
-      });
-    }
-  };
-  const loadData = () => {
-    ProductDetailService.list().then((res) => {
-      setItems(res.data);
-    });
+  // const loadOrder = () => {
+  //   if (isLoggedIn) {
+  //     orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
+  //       setOrder(res.data);
+  //       const last = res.pagingInfo.totalPages - 1;
+  //       var left = orderPage - 2,
+  //         right = orderPage + 2 + 1,
+  //         range = [],
+  //         rangeWithDots = [];
+  //       let l;
+  //       for (let i = 0; i <= last; i++) {
+  //         if (i === 0 || i === last || (i >= left && i < right)) {
+  //           range.push(i);
+  //         }
+  //       }
+  //       //mũi tên
+  //       if (res.pagingInfo.totalPages > 0) {
+  //         rangeWithDots = [
+  //           <Pagination.First
+  //             key="frist"
+  //             disabled={orderPage === 0}
+  //             onClick={() => setOrderPage(0)}
+  //           />,
+  //           <Pagination.Prev
+  //             key="Previous"
+  //             disabled={orderPage === 0}
+  //             onClick={() => setOrderPage(res.pagingInfo.page - 1)}
+  //           />,
+  //         ];
+  //       }
+  //       for (let i of range) {
+  //         if (l) {
+  //           if (i - l === 4) {
+  //             rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
+  //           } else if (i - l !== 1) {
+  //             rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
+  //           }
+  //         }
+  //         rangeWithDots.push(
+  //           <Pagination.Item
+  //             key={i}
+  //             active={i === orderPage}
+  //             onClick={() => setOrderPage(i)}
+  //           >
+  //             {i + 1}
+  //           </Pagination.Item>
+  //         );
+  //         l = i;
+  //       }
+  //       //mũi tên cuối
+  //       rangeWithDots.push(
+  //         <Pagination.Next
+  //           key="Next"
+  //           disabled={orderPage === res.pagingInfo.totalPages - 1}
+  //           onClick={() => setOrderPage(res.pagingInfo.page + 1)}
+  //         />,
+  //         <Pagination.Last
+  //           key="last"
+  //           disabled={orderPage === res.pagingInfo.totalPages - 1}
+  //           onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
+  //         />
+  //       );
+  //       setOrderPagingItems(rangeWithDots);
+  //     });
+  //   }
+  // };
+  // const loadData = () => {
+  //   ProductDetailService.list().then((res) => {
+  //     setItems(res.data);
+  //   });
 
-    ProductDetailService.getPaging(page, pageLength).then((res) => {
-      setProductDetail(res.data);
+  //   ProductDetailService.getPaging(page, pageLength).then((res) => {
+  //     setProductDetail(res.data);
 
-      const last = res.pagingInfo.totalPages - 1;
-      var left = page - 2,
-        right = page + 2 + 1,
-        range = [],
-        rangeWithDots = [];
-      let l;
+  //     const last = res.pagingInfo.totalPages - 1;
+  //     var left = page - 2,
+  //       right = page + 2 + 1,
+  //       range = [],
+  //       rangeWithDots = [];
+  //     let l;
 
-      for (let i = 0; i <= last; i++) {
-        if (i === 0 || i === last || (i >= left && i < right)) {
-          range.push(i);
-        }
-      }
+  //     for (let i = 0; i <= last; i++) {
+  //       if (i === 0 || i === last || (i >= left && i < right)) {
+  //         range.push(i);
+  //       }
+  //     }
 
-      //mũi tên
-      if (res.pagingInfo.totalPages > 0) {
-        rangeWithDots = [
-          <Pagination.First
-            key="frist"
-            disabled={page === 0}
-            onClick={() => setPage(0)}
-          />,
-          <Pagination.Prev
-            key="Previous"
-            disabled={page === 0}
-            onClick={() => setPage(res.pagingInfo.page - 1)}
-          />,
-        ];
-      }
+  //     //mũi tên
+  //     if (res.pagingInfo.totalPages > 0) {
+  //       rangeWithDots = [
+  //         <Pagination.First
+  //           key="frist"
+  //           disabled={page === 0}
+  //           onClick={() => setPage(0)}
+  //         />,
+  //         <Pagination.Prev
+  //           key="Previous"
+  //           disabled={page === 0}
+  //           onClick={() => setPage(res.pagingInfo.page - 1)}
+  //         />,
+  //       ];
+  //     }
 
-      for (let i of range) {
-        if (l) {
-          if (i - l === 4) {
-            rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
-          } else if (i - l !== 1) {
-            rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
-          }
-        }
+  //     for (let i of range) {
+  //       if (l) {
+  //         if (i - l === 4) {
+  //           rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
+  //         } else if (i - l !== 1) {
+  //           rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
+  //         }
+  //       }
 
-        rangeWithDots.push(
-          <Pagination.Item
-            key={i}
-            active={i === page}
-            onClick={() => setPage(i)}
-          >
-            {i + 1}
-          </Pagination.Item>
-        );
-        l = i;
-      }
+  //       rangeWithDots.push(
+  //         <Pagination.Item
+  //           key={i}
+  //           active={i === page}
+  //           onClick={() => setPage(i)}
+  //         >
+  //           {i + 1}
+  //         </Pagination.Item>
+  //       );
+  //       l = i;
+  //     }
 
-      //mũi tên cuối
+  //     //mũi tên cuối
 
-      rangeWithDots.push(
-        <Pagination.Next
-          key="Next"
-          disabled={page === res.pagingInfo.totalPages - 1}
-          onClick={() => setPage(res.pagingInfo.page + 1)}
-        />,
-        <Pagination.Last
-          key="last"
-          disabled={page === res.pagingInfo.totalPages - 1}
-          onClick={() => setPage(res.pagingInfo.totalPages - 1)}
-        />
-      );
+  //     rangeWithDots.push(
+  //       <Pagination.Next
+  //         key="Next"
+  //         disabled={page === res.pagingInfo.totalPages - 1}
+  //         onClick={() => setPage(res.pagingInfo.page + 1)}
+  //       />,
+  //       <Pagination.Last
+  //         key="last"
+  //         disabled={page === res.pagingInfo.totalPages - 1}
+  //         onClick={() => setPage(res.pagingInfo.totalPages - 1)}
+  //       />
+  //     );
 
-      setPagingItems(rangeWithDots);
-    });
-  };
+  //     setPagingItems(rangeWithDots);
+  //   });
+  // };
 
-  useEffect(() => {
-    loadData();
-    loadOrder();
-  }, [page, pageLength, orderPage, orderPageLength]);
+  // useEffect(() => {
+  //   loadData();
+  //   loadOrder();
+  // }, [page, pageLength, orderPage, orderPageLength]);
 
   //---------------------FrontEnd------------------------------------------
 
@@ -287,7 +289,7 @@ export const CartProvider = ({ children }) => {
     <CartStateContext.Provider
       value={{
         items,
-        loadData,
+        // loadData,
 
         order,
         orderPagingItems,
