@@ -31,7 +31,6 @@ const url = {
   orderMem: "member/orderMem",
   orderMemDetail: "api/orderMemDetail",
 };
-
 const instance = axios.create({
   baseURL: url.baseUrl,
   headers: {
