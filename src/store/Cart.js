@@ -40,18 +40,18 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
   const [check, setCheck] = useState([cartItems]);
 
-  if (isLoggedIn) {
-    if (cartItems.length !== 0 && check !== cartItems) {
-      const cart = { cartItem: cartItems };
-      setTimeout(function () {
-        cartService.updateCart(cart).then((res) => {
-          if (res.errorCode === 0) {
-            setCheck(cartItems);
-          }
-        });
-      }, 10000);
-    }
-  }
+  // if (isLoggedIn) {
+  //   if (cartItems.length !== 0 && check !== cartItems) {
+  //     const cart = { cartItem: cartItems };
+  //     setTimeout(function () {
+  //       cartService.updateCart(cart).then((res) => {
+  //         if (res.errorCode === 0) {
+  //           setCheck(cartItems);
+  //         }
+  //       });
+  //     }, 10000);
+  //   }
+  // }
 
   // const loadOrder = () => {
   //   if (isLoggedIn) {
