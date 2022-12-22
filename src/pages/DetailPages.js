@@ -27,7 +27,7 @@ const DetailPages = () => {
         navigate("/PageNotFound");
       }
     });
-  });
+  }, [id, navigate]);
 
   const quantity = getItemQuantity(Number(id));
 

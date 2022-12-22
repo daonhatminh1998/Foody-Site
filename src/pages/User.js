@@ -51,7 +51,7 @@ const User = () => {
 
   useEffect(() => {
     loadReceiver();
-  }, []);
+  }, [setReceiver]);
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();

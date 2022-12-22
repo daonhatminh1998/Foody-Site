@@ -1,4 +1,7 @@
+import { useEffect } from "react";
+import { useState } from "react";
 import { Button, Col, Row, Image, Form } from "react-bootstrap";
+import ProductDetailService from "../../services/productDetailService";
 import { useCart } from "../../store/Cart";
 import formatCurrency from "../../utilities/formatCurrency";
 

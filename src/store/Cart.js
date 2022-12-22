@@ -40,6 +40,12 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
   const [check, setCheck] = useState([cartItems]);
 
+  useEffect(() => {
+    ProductDetailService.list().then((res) => {
+      setItems(res.data);
+    });
+  }, [setItems]);
+
   // if (isLoggedIn) {
   //   if (cartItems.length !== 0 && check !== cartItems) {
   //     const cart = { cartItem: cartItems };

@@ -39,18 +39,17 @@ export function ShoppingCart({ isOpen }) {
 
   const [receiver, setReceiver] = useState([]);
   const loadReceiver = () => {
-    if (isLoggedIn) {
-      receiverService.list().then((res) => {
-        if (res.errorCode === 0) {
-          setReceiver(res.data);
-        }
-      });
-    }
+    console.log("load data receiver");
+    receiverService.list().then((res) => {
+      console.log(res);
+      setReceiver(res.data);
+    });
   };
 
   useEffect(() => {
     loadReceiver();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setReceiver]);
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
