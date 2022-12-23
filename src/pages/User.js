@@ -32,26 +32,112 @@ import { toast } from "react-toastify";
 import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";
 import CardHeader from "react-bootstrap/esm/CardHeader";
-import { useCart } from "../store/Cart";
 import { useEffect } from "react";
 
 const User = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
-  const { order, orderPagingItems } = useCart();
 
   const [receiver, setReceiver] = useState([]);
+  const [order, setOrder] = useState([]);
+  const [orderPage, setOrderPage] = useState(0);
+  const [orderPageLength] = useState(4);
+  const [orderPagingItems, setOrderPagingItems] = useState([]);
 
+  const [loadingReceiver, setLoadingReceiver] = useState(false);
   const loadReceiver = () => {
+    setLoadingReceiver(true);
     receiverService.list().then((res) => {
-      setReceiver(res.data);
+      if (res.errorCode === 0) {
+        setLoadingReceiver(false);
+        setReceiver(res.data);
+      }
+    });
+  };
+
+  const [loadingOrder, setLoadingOrder] = useState(false);
+  const loadOrder = () => {
+    setLoadingOrder(true);
+    console.log("load order here");
+    orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
+      console.log(res);
+      if (res.errorCode === 0) {
+        setLoadingOrder(false);
+        setOrder(res.data);
+      }
+
+      const last = res.pagingInfo.totalPages - 1;
+      var left = orderPage - 2,
+        right = orderPage + 2 + 1,
+        range = [],
+        rangeWithDots = [];
+      let l;
+      for (let i = 0; i <= last; i++) {
+        if (i === 0 || i === last || (i >= left && i < right)) {
+          range.push(i);
+        }
+      }
+      //mũi tên
+      if (res.pagingInfo.totalPages > 0) {
+        rangeWithDots = [
+          <Pagination.First
+            key="frist"
+            disabled={orderPage === 0}
+            onClick={() => setOrderPage(0)}
+          />,
+          <Pagination.Prev
+            key="Previous"
+            disabled={orderPage === 0}
+            onClick={() => setOrderPage(res.pagingInfo.page - 1)}
+          />,
+        ];
+      }
+      for (let i of range) {
+        if (l) {
+          if (i - l === 4) {
+            rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
+          } else if (i - l !== 1) {
+            rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
+          }
+        }
+        rangeWithDots.push(
+          <Pagination.Item
+            key={i}
+            active={i === orderPage}
+            onClick={() => setOrderPage(i)}
+          >
+            {i + 1}
+          </Pagination.Item>
+        );
+        l = i;
+      }
+      //mũi tên cuối
+      rangeWithDots.push(
+        <Pagination.Next
+          key="Next"
+          disabled={orderPage === res.pagingInfo.totalPages - 1}
+          onClick={() => setOrderPage(res.pagingInfo.page + 1)}
+        />,
+        <Pagination.Last
+          key="last"
+          disabled={orderPage === res.pagingInfo.totalPages - 1}
+          onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
+        />
+      );
+      setOrderPagingItems(rangeWithDots);
     });
   };
 
   useEffect(() => {
     loadReceiver();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setReceiver]);
+
+  useEffect(() => {
+    loadOrder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setOrderPage]);
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
@@ -634,143 +720,159 @@ const User = () => {
                           className="bg-light rounded-4 bg-icon"
                         >
                           <tbody>
-                            {receiver.length !== 0 ? (
-                              <>
-                                {receiver.map((list) => (
-                                  <tr key={list.Re_Id}>
-                                    {list.is_Default ? (
-                                      <>
-                                        <td className="py-3">
-                                          <Form
-                                            className="bg-primary"
-                                            as={Button}
-                                            onClick={(e) => {
-                                              defaultReceiver(e, list.Re_Id, 1);
-                                            }}
-                                          />
-                                        </td>
-
-                                        <td className="border-bottom border-dark py-3">
-                                          <Row sm={1}>
-                                            <Col>
-                                              {list.name} | {list.phone}
-                                            </Col>
-                                            <Col className="text-muted fs-6">
-                                              {list.address}
-                                            </Col>
-
-                                            <Col sm={12} className=" fs-6 pt-2">
-                                              <span className="text-danger border border-2 border-danger px-2">
-                                                Default
-                                              </span>
-                                            </Col>
-                                          </Row>
-                                        </td>
-
-                                        <td
-                                          className=" py-3"
-                                          style={{ width: "50px" }}
-                                        >
-                                          <a
-                                            href="/#"
-                                            onClick={(e) =>
-                                              showEditModal(e, list.Re_Id)
-                                            }
-                                          >
-                                            <i className="bi-pencil-square text-primary" />
-                                          </a>
-                                          <a
-                                            href="/#"
-                                            onClick={(e) =>
-                                              handleDelete(e, list.Re_Id)
-                                            }
-                                          >
-                                            <i className="bi-trash text-danger" />
-                                          </a>
-                                        </td>
-                                      </>
-                                    ) : (
-                                      <></>
-                                    )}
-                                  </tr>
-                                ))}
-
-                                {receiver.map((list) => (
-                                  <tr key={list.Re_Id}>
-                                    {!list.is_Default ? (
-                                      <>
-                                        <td className="py-3">
-                                          <Form
-                                            className="bg-secondary"
-                                            as={Button}
-                                            onClick={(e) => {
-                                              defaultReceiver(
-                                                e,
-                                                list.Re_Id,
-                                                list.is_Default
-                                              );
-                                            }}
-                                          />
-                                        </td>
-
-                                        <td className="border-bottom border-dark py-3">
-                                          <Row sm={1}>
-                                            <Col>
-                                              {list.name} | {list.phone}
-                                            </Col>
-                                            <Col className="text-muted fs-6">
-                                              {list.address}
-                                            </Col>
-                                          </Row>
-                                        </td>
-
-                                        <td
-                                          className=" py-3"
-                                          style={{ width: "50px" }}
-                                        >
-                                          <a
-                                            href="/#"
-                                            onClick={(e) =>
-                                              showEditModal(e, list.Re_Id)
-                                            }
-                                          >
-                                            <i className="bi-pencil-square text-primary" />
-                                          </a>
-                                          <a
-                                            href="/#"
-                                            onClick={(e) =>
-                                              handleDelete(e, list.Re_Id)
-                                            }
-                                          >
-                                            <i className="bi-trash text-danger" />
-                                          </a>
-                                        </td>
-                                      </>
-                                    ) : (
-                                      <></>
-                                    )}
-                                  </tr>
-                                ))}
-                              </>
-                            ) : (
-                              <tr className="text-center ">
-                                <td colSpan={3} className="py-3">
-                                  <h1>You don't have any receiver!</h1>
+                            {loadingReceiver ? (
+                              <tr className="align-middle text-center">
+                                <td colSpan="6">
+                                  <div className="spinner-border spinner-border-lg text-grey" />
                                 </td>
                               </tr>
-                            )}
+                            ) : (
+                              <>
+                                {receiver.length !== 0 ? (
+                                  <>
+                                    {receiver.map((list) => (
+                                      <tr key={list.Re_Id}>
+                                        {list.is_Default ? (
+                                          <>
+                                            <td className="py-3">
+                                              <Form
+                                                className="bg-primary"
+                                                as={Button}
+                                                onClick={(e) => {
+                                                  defaultReceiver(
+                                                    e,
+                                                    list.Re_Id,
+                                                    1
+                                                  );
+                                                }}
+                                              />
+                                            </td>
 
-                            <tr className="text-center ">
-                              <td colSpan={3} className="py-3">
-                                <Button
-                                  variant="primary"
-                                  type="button"
-                                  onClick={() => showEditModal(null, 0)}
-                                >
-                                  <i className="bi-plus-lg" /> Add More
-                                </Button>
-                              </td>
-                            </tr>
+                                            <td className="border-bottom border-dark py-3">
+                                              <Row sm={1}>
+                                                <Col>
+                                                  {list.name} | {list.phone}
+                                                </Col>
+                                                <Col className="text-muted fs-6">
+                                                  {list.address}
+                                                </Col>
+
+                                                <Col
+                                                  sm={12}
+                                                  className=" fs-6 pt-2"
+                                                >
+                                                  <span className="text-danger border border-2 border-danger px-2">
+                                                    Default
+                                                  </span>
+                                                </Col>
+                                              </Row>
+                                            </td>
+
+                                            <td
+                                              className=" py-3"
+                                              style={{ width: "50px" }}
+                                            >
+                                              <a
+                                                href="/#"
+                                                onClick={(e) =>
+                                                  showEditModal(e, list.Re_Id)
+                                                }
+                                              >
+                                                <i className="bi-pencil-square text-primary" />
+                                              </a>
+                                              <a
+                                                href="/#"
+                                                onClick={(e) =>
+                                                  handleDelete(e, list.Re_Id)
+                                                }
+                                              >
+                                                <i className="bi-trash text-danger" />
+                                              </a>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </tr>
+                                    ))}
+
+                                    {receiver.map((list) => (
+                                      <tr key={list.Re_Id}>
+                                        {!list.is_Default ? (
+                                          <>
+                                            <td className="py-3">
+                                              <Form
+                                                className="bg-secondary"
+                                                as={Button}
+                                                onClick={(e) => {
+                                                  defaultReceiver(
+                                                    e,
+                                                    list.Re_Id,
+                                                    list.is_Default
+                                                  );
+                                                }}
+                                              />
+                                            </td>
+
+                                            <td className="border-bottom border-dark py-3">
+                                              <Row sm={1}>
+                                                <Col>
+                                                  {list.name} | {list.phone}
+                                                </Col>
+                                                <Col className="text-muted fs-6">
+                                                  {list.address}
+                                                </Col>
+                                              </Row>
+                                            </td>
+
+                                            <td
+                                              className=" py-3"
+                                              style={{ width: "50px" }}
+                                            >
+                                              <a
+                                                href="/#"
+                                                onClick={(e) =>
+                                                  showEditModal(e, list.Re_Id)
+                                                }
+                                              >
+                                                <i className="bi-pencil-square text-primary" />
+                                              </a>
+                                              <a
+                                                href="/#"
+                                                onClick={(e) =>
+                                                  handleDelete(e, list.Re_Id)
+                                                }
+                                              >
+                                                <i className="bi-trash text-danger" />
+                                              </a>
+                                            </td>
+                                          </>
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </tr>
+                                    ))}
+                                  </>
+                                ) : (
+                                  <tr className="text-center ">
+                                    <td colSpan={3} className="py-3">
+                                      <h1>You don't have any receiver!</h1>
+                                    </td>
+                                  </tr>
+                                )}
+                                <tr className="text-center ">
+                                  <td colSpan={3} className="py-3">
+                                    <Button
+                                      variant="primary"
+                                      type="button"
+                                      onClick={() => showEditModal(null, 0)}
+                                    >
+                                      <i className="bi-plus-lg" /> Add More
+                                    </Button>
+                                  </td>
+                                </tr>
+                              </>
+                            )}
                           </tbody>
                         </Table>
                       </Tab.Pane>
@@ -786,7 +888,7 @@ const User = () => {
                         <Table
                           responsive
                           bordered
-                          className="bg-light bg-icon text-center "
+                          className="bg-light bg-icon text-center"
                         >
                           <thead>
                             <tr className="bg-primary align-middle">
@@ -798,37 +900,50 @@ const User = () => {
                           </thead>
 
                           <tbody>
-                            {order.length !== 0 ? (
-                              <>
-                                {order.map((list) => (
-                                  <tr key={list.ORD_Id}>
-                                    <td>{list.ORD_Code}</td>
-                                    <td>{list.ORD_Name}</td>
-                                    <td>{list.ORD_DateTime}</td>
-                                    <td>
-                                      <Row sm={1}>
-                                        <Col>View more</Col>
-                                        <Col>
-                                          <a
-                                            href="/#"
-                                            onClick={(e) =>
-                                              showOrderInfoModal(e, list.ORD_Id)
-                                            }
-                                          >
-                                            <i className="bi bi-eye-fill text-primary pe-2" />
-                                          </a>
-                                        </Col>
-                                      </Row>
-                                    </td>
-                                  </tr>
-                                ))}
-                              </>
-                            ) : (
-                              <tr className="text-center ">
-                                <td colSpan={4} className="py-3">
-                                  <h1>You don't have any order!</h1>
+                            {loadingOrder ? (
+                              <tr className="align-middle">
+                                <td colSpan="6">
+                                  <div className="spinner-border spinner-border-lg text-grey" />
                                 </td>
                               </tr>
+                            ) : (
+                              <>
+                                {order.length !== 0 ? (
+                                  <>
+                                    {order.map((list) => (
+                                      <tr key={list.ORD_Id}>
+                                        <td>{list.ORD_Code}</td>
+                                        <td>{list.ORD_Name}</td>
+                                        <td>{list.ORD_DateTime}</td>
+                                        <td>
+                                          <Row sm={1}>
+                                            <Col>View more</Col>
+                                            <Col>
+                                              <a
+                                                href="/#"
+                                                onClick={(e) =>
+                                                  showOrderInfoModal(
+                                                    e,
+                                                    list.ORD_Id
+                                                  )
+                                                }
+                                              >
+                                                <i className="bi bi-eye-fill text-primary pe-2" />
+                                              </a>
+                                            </Col>
+                                          </Row>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </>
+                                ) : (
+                                  <tr className="text-center ">
+                                    <td colSpan={4} className="py-3">
+                                      <h1>You don't have any order!</h1>
+                                    </td>
+                                  </tr>
+                                )}
+                              </>
                             )}
                           </tbody>
                         </Table>

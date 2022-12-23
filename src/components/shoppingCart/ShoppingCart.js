@@ -39,11 +39,11 @@ export function ShoppingCart({ isOpen }) {
 
   const [receiver, setReceiver] = useState([]);
   const loadReceiver = () => {
-    console.log("load data receiver");
-    receiverService.list().then((res) => {
-      console.log(res);
-      setReceiver(res.data);
-    });
+    if (isLoggedIn) {
+      receiverService.list().then((res) => {
+        setReceiver(res.data);
+      });
+    }
   };
 
   useEffect(() => {
