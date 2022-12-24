@@ -51,11 +51,13 @@ const User = () => {
 
   const loadReceiver = () => {
     setLoadingReceiver(true);
-    receiverService.list().then((res) => {
-      console.log("load receiver here");
-      setLoadingReceiver(false);
-      setReceiver(res.data);
-    });
+    setTimeout(function () {
+      receiverService.list().then((res) => {
+        console.log("load receiver here");
+        setLoadingReceiver(false);
+        setReceiver(res.data);
+      });
+    }, 2000);
   };
 
   const loadOrder = () => {
