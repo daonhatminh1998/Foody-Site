@@ -33,11 +33,8 @@ import CustomButton from "../components/CustomButton";
 import Input from "../components/Input";
 import CardHeader from "react-bootstrap/esm/CardHeader";
 import { useEffect } from "react";
-import { useCart } from "../store/Cart";
 
 const User = () => {
-  const { receiver, loadingReceiver, loadReceiver } = useCart();
-
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
@@ -48,99 +45,103 @@ const User = () => {
   const [orderPageLength] = useState(4);
   const [orderPagingItems, setOrderPagingItems] = useState([]);
 
-  // const [loadingReceiver, setLoadingReceiver] = useState(false);
-  // const loadReceiver = () => {
-  //   setLoadingReceiver(true);
-  //   receiverService.list().then((res) => {
-  //     if (res.errorCode === 0) {
-  //       setLoadingReceiver(false);
-  //       setReceiver(res.data);
-  //     }
-  //   });
-  // };
+  const [receiver, setReceiver] = useState([]);
+  const [loadingReceiver, setLoadingReceiver] = useState(false);
 
   const [loadingOrder, setLoadingOrder] = useState(false);
-  const loadOrder = () => {
-    setLoadingOrder(true);
-    console.log("load order here");
-    orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
-      console.log(res);
-      if (res.errorCode === 0) {
-        setLoadingOrder(false);
-        setOrder(res.data);
-      }
 
-      const last = res.pagingInfo.totalPages - 1;
-      var left = orderPage - 2,
-        right = orderPage + 2 + 1,
-        range = [],
-        rangeWithDots = [];
-      let l;
-      for (let i = 0; i <= last; i++) {
-        if (i === 0 || i === last || (i >= left && i < right)) {
-          range.push(i);
-        }
-      }
-      //mũi tên
-      if (res.pagingInfo.totalPages > 0) {
-        rangeWithDots = [
-          <Pagination.First
-            key="frist"
-            disabled={orderPage === 0}
-            onClick={() => setOrderPage(0)}
-          />,
-          <Pagination.Prev
-            key="Previous"
-            disabled={orderPage === 0}
-            onClick={() => setOrderPage(res.pagingInfo.page - 1)}
-          />,
-        ];
-      }
-      for (let i of range) {
-        if (l) {
-          if (i - l === 4) {
-            rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
-          } else if (i - l !== 1) {
-            rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
-          }
-        }
-        rangeWithDots.push(
-          <Pagination.Item
-            key={i}
-            active={i === orderPage}
-            onClick={() => setOrderPage(i)}
-          >
-            {i + 1}
-          </Pagination.Item>
-        );
-        l = i;
-      }
-      //mũi tên cuối
-      rangeWithDots.push(
-        <Pagination.Next
-          key="Next"
-          disabled={orderPage === res.pagingInfo.totalPages - 1}
-          onClick={() => setOrderPage(res.pagingInfo.page + 1)}
-        />,
-        <Pagination.Last
-          key="last"
-          disabled={orderPage === res.pagingInfo.totalPages - 1}
-          onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
-        />
-      );
-      setOrderPagingItems(rangeWithDots);
+  const loadReceiver = () => {
+    setLoadingReceiver(true);
+    receiverService.list().then((res) => {
+      console.log("load receiver here");
+      setLoadingReceiver(false);
+      setReceiver(res.data);
     });
   };
 
-  // useEffect(() => {
-  //   loadReceiver();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [setReceiver]);
+  const loadOrder = () => {
+    setLoadingOrder(true);
+
+    setTimeout(function () {
+      orderMemService.getPaging(orderPage, orderPageLength).then((res) => {
+        console.log("load order here");
+        if (res.errorCode === 0) {
+          setLoadingOrder(false);
+          setOrder(res.data);
+        }
+
+        const last = res.pagingInfo.totalPages - 1;
+        var left = orderPage - 2,
+          right = orderPage + 2 + 1,
+          range = [],
+          rangeWithDots = [];
+        let l;
+        for (let i = 0; i <= last; i++) {
+          if (i === 0 || i === last || (i >= left && i < right)) {
+            range.push(i);
+          }
+        }
+        //mũi tên
+        if (res.pagingInfo.totalPages > 0) {
+          rangeWithDots = [
+            <Pagination.First
+              key="frist"
+              disabled={orderPage === 0}
+              onClick={() => setOrderPage(0)}
+            />,
+            <Pagination.Prev
+              key="Previous"
+              disabled={orderPage === 0}
+              onClick={() => setOrderPage(res.pagingInfo.page - 1)}
+            />,
+          ];
+        }
+        for (let i of range) {
+          if (l) {
+            if (i - l === 4) {
+              rangeWithDots.push(<Pagination.Ellipsis key={l + 1} disabled />);
+            } else if (i - l !== 1) {
+              rangeWithDots.push(<Pagination.Ellipsis key="..." disabled />);
+            }
+          }
+          rangeWithDots.push(
+            <Pagination.Item
+              key={i}
+              active={i === orderPage}
+              onClick={() => setOrderPage(i)}
+            >
+              {i + 1}
+            </Pagination.Item>
+          );
+          l = i;
+        }
+        //mũi tên cuối
+        rangeWithDots.push(
+          <Pagination.Next
+            key="Next"
+            disabled={orderPage === res.pagingInfo.totalPages - 1}
+            onClick={() => setOrderPage(res.pagingInfo.page + 1)}
+          />,
+          <Pagination.Last
+            key="last"
+            disabled={orderPage === res.pagingInfo.totalPages - 1}
+            onClick={() => setOrderPage(res.pagingInfo.totalPages - 1)}
+          />
+        );
+        setOrderPagingItems(rangeWithDots);
+      });
+    }, 5000);
+  };
 
   useEffect(() => {
     loadOrder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setOrderPage]);
+  }, [orderPage]);
+
+  useEffect(() => {
+    loadReceiver();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setReceiver]);
 
   const [isWaiting, setIsWaiting] = useState(false);
   const navigate = useNavigate();
@@ -282,7 +283,13 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Add Successful");
 
-          loadReceiver();
+          setLoadingReceiver(true);
+          receiverService.list().then((res) => {
+            if (res.errorCode === 0) {
+              setLoadingReceiver(false);
+              setReceiver(res.data);
+            }
+          });
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -296,7 +303,13 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Update Successful");
 
-          loadReceiver();
+          setLoadingReceiver(true);
+          receiverService.list().then((res) => {
+            if (res.errorCode === 0) {
+              setLoadingReceiver(false);
+              setReceiver(res.data);
+            }
+          });
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -330,7 +343,13 @@ const User = () => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
 
-        loadReceiver();
+        setLoadingReceiver(true);
+        receiverService.list().then((res) => {
+          if (res.errorCode === 0) {
+            setLoadingReceiver(false);
+            setReceiver(res.data);
+          }
+        });
       } else {
         toast.error(res.message);
       }
@@ -366,7 +385,13 @@ const User = () => {
     receiverService.defaultReceiver(data.Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Change Successful");
-        loadReceiver();
+        setLoadingReceiver(true);
+        receiverService.list().then((res) => {
+          if (res.errorCode === 0) {
+            setLoadingReceiver(false);
+            setReceiver(res.data);
+          }
+        });
 
         closeDefaultModal();
       } else {
