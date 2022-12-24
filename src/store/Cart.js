@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useContext, useEffect, useState } from "react";
-import { Pagination } from "react-bootstrap";
 
 import { useSelector } from "react-redux";
 
@@ -124,10 +123,11 @@ export const CartProvider = ({ children }) => {
   }
 
   const clearCart = () => {
+    const clearItem = [];
     if (isLoggedIn) {
       cartService.deleteAll();
     }
-    setCartItems([]);
+    return setCartItems(clearItem);
   };
 
   //---------------------BackEnd------------------------------------------

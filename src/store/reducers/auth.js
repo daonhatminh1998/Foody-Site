@@ -6,7 +6,6 @@ const authSlice = createSlice({
     isLoggedIn: false,
     token: null,
     userInfo: {},
-    cartInfo: {},
   },
 
   reducers: {
@@ -20,12 +19,6 @@ const authSlice = createSlice({
       state.isLoggedIn = false;
       state.token = null;
       state.userInfo = {};
-      state.cartInfo = {};
-    },
-
-    cart: (state, action) => {
-      state.isLoggedIn = true;
-      state.cartInfo = action.payload.cartInfo;
     },
 
     updateInfo: (state, action) => {

@@ -38,17 +38,22 @@ const Login = () => {
             userInfo: res.data,
           })
         );
-        cartService.listCart().then((res) => {
-          setCartItems(
-            res.data.cart_detail.map((item) => ({
-              id: item.ProDe_Id,
-              quantity: item.CartDe_Quantity,
-              select:
-                cartItems.find((items) => items.id === item.ProDe_Id)?.select ||
-                0,
-            }))
-          );
-        });
+
+        setTimeout(function () {
+          cartService.listCart().then((res) => {
+            setCartItems(
+              res.data.cart_detail.map((item) => ({
+                id: item.ProDe_Id,
+                quantity: item.CartDe_Quantity,
+                select:
+                  cartItems.find((items) => items.id === item.ProDe_Id)
+                    ?.select || 0,
+              }))
+            );
+            console.log(res.data.cart_detail);
+          });
+        }, 3000);
+
         navigate("/");
         window.scrollTo(0, 0);
       } else {
