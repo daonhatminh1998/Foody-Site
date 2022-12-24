@@ -35,17 +35,17 @@ export const CartProvider = ({ children }) => {
   }, [setItems]);
 
   if (isLoggedIn) {
-    if (cartItems.length !== 0 && check !== cartItems) {
-      const cart = { cartItem: cartItems };
-      setTimeout(function () {
+    setTimeout(function () {
+      if (cartItems.length !== 0 && check !== cartItems) {
         // console.log("up lên back");
+        const cart = { cartItem: cartItems };
         cartService.updateCart(cart).then((res) => {
           if (res.errorCode === 0) {
             setCheck(cartItems);
           }
         });
-      }, 10000);
-    }
+      }
+    }, 60000);
   }
 
   //---------------------FrontEnd------------------------------------------

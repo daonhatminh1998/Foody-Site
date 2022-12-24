@@ -50,7 +50,7 @@ const Login = () => {
                     ?.select || 0,
               }))
             );
-            console.log(res.data.cart_detail);
+            // console.log(res.data.cart_detail);
           });
         }, 3000);
 
