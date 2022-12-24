@@ -36,8 +36,6 @@ import { useEffect } from "react";
 import { useCart } from "../store/Cart";
 
 const User = () => {
-  const { receiver, loadingReceiver, loadReceiver } = useCart();
-
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
@@ -47,7 +45,20 @@ const User = () => {
   const [orderPage, setOrderPage] = useState(0);
   const [orderPageLength] = useState(4);
   const [orderPagingItems, setOrderPagingItems] = useState([]);
+  const [loadingReceiver, setLoadingReceiver] = useState(false);
+  const [receiver, setReceiver] = useState([]);
 
+  const loadReceiver = () => {
+    setLoadingReceiver(true);
+    console.log("receiver here");
+    receiverService.list().then((res) => {
+      console.log(res);
+      if (res.errorCode === 0) {
+        setLoadingReceiver(false);
+        setReceiver(res.data);
+      }
+    });
+  };
   // const [loadingReceiver, setLoadingReceiver] = useState(false);
   // const loadReceiver = () => {
   //   setLoadingReceiver(true);

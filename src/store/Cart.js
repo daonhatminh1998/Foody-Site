@@ -41,34 +41,10 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
   const [check, setCheck] = useState([cartItems]);
 
-  const [loadingReceiver, setLoadingReceiver] = useState(false);
-  const [receiver, setReceiver] = useState([]);
-  const loadReceiver = () => {
-    if (isLoggedIn) {
-      ProductDetailService.list().then((res) => {
-        setItems(res.data);
-        setLoadingReceiver(true);
-        console.log("receiver here");
-        receiverService.list().then((res) => {
-          console.log(res);
-          if (res.errorCode === 0) {
-            setLoadingReceiver(false);
-            setReceiver(res.data);
-          }
-        });
-      });
-    } else {
-      ProductDetailService.list().then((res) => {
-        setItems(res.data);
-      });
-    }
-  };
-
   useEffect(() => {
     ProductDetailService.list().then((res) => {
       setItems(res.data);
     });
-    // loadReceiver();
   }, [setItems]);
 
   // if (isLoggedIn) {
@@ -321,10 +297,6 @@ export const CartProvider = ({ children }) => {
       value={{
         items,
         // loadData,
-        receiver,
-        loadingReceiver,
-        setReceiver,
-        loadReceiver,
 
         order,
         orderPagingItems,
