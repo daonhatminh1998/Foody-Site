@@ -7,14 +7,19 @@ import formatCurrency from "../../utilities/formatCurrency";
 
 export function CartItem({ id, quantity, select }) {
   const {
-    items,
     selectItem,
+    items,
     increaseCartQuantity,
     decreaseCartQuantity,
     removeFromCart,
   } = useCart();
-
   const item = items.find((i) => i.ProDe_Id === id);
+
+  // const [item, setItems] = useState([]);
+  // ProductDetailService.get(id).then((res) => {
+  //   setItems(res.data);
+  // });
+
   if (!item) return null;
 
   return (

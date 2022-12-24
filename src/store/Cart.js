@@ -65,8 +65,11 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    loadReceiver();
-  }, [setItems, setReceiver]);
+    ProductDetailService.list().then((res) => {
+      setItems(res.data);
+    });
+    // loadReceiver();
+  }, [setItems]);
 
   // if (isLoggedIn) {
   //   if (cartItems.length !== 0 && check !== cartItems) {

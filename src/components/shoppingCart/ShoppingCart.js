@@ -37,27 +37,13 @@ export function ShoppingCart({ isOpen }) {
     items,
     clearCart,
     removeItem,
-    receiver,
-    loadReceiver,
+    // receiver,
+    // loadReceiver,
   } = useCart();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isWaiting, setIsWaiting] = useState(false);
-
-  // const [receiver, setReceiver] = useState([]);
-  // const loadReceiver = () => {
-  //   if (isLoggedIn) {
-  //     receiverService.list().then((res) => {
-  //       setReceiver(res.data);
-  //     });
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   loadReceiver();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [setReceiver]);
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
@@ -167,7 +153,9 @@ export function ShoppingCart({ isOpen }) {
         if (res.errorCode === 0) {
           toast.success("Add Successful");
           checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
-          loadReceiver();
+          receiverService.list().then((res) => {
+            setReceiver(res.data);
+          });
 
           closeReceiverFunctionModal();
         } else {
@@ -184,7 +172,9 @@ export function ShoppingCart({ isOpen }) {
           if (res.data.is_Default && res.data.is_Chosen) {
             checkChosen.setFieldValue("Re_Id", res.data.Re_Id);
           }
-          loadReceiver();
+          receiverService.list().then((res) => {
+            setReceiver(res.data);
+          });
 
           closeReceiverFunctionModal();
         } else {
@@ -221,7 +211,9 @@ export function ShoppingCart({ isOpen }) {
         if (res.data) {
           setReceiverOrder([]);
         }
-        loadReceiver();
+        receiverService.list().then((res) => {
+          setReceiver(res.data);
+        });
         toast.success("Delete Successful");
       } else {
         toast.error(res.message);
@@ -253,8 +245,10 @@ export function ShoppingCart({ isOpen }) {
       setIsWaiting(false);
       if (res.errorCode === 0) {
         toast.success("Select Successful");
-        loadReceiver();
         setReceiverOrder(res.data);
+        receiverService.list().then((res) => {
+          setReceiver(res.data);
+        });
 
         closeReceiverModal();
         showOrderModal();
@@ -269,6 +263,7 @@ export function ShoppingCart({ isOpen }) {
   const [orderModal, setOrderModal] = useState(false);
   const closeOrderModal = () => setOrderModal(false);
   const showOrderModal = () => setOrderModal(true);
+  const [receiver, setReceiver] = useState([]);
 
   const resetReceiver = () => {
     receiverService.reset().then((res) => {
@@ -278,7 +273,10 @@ export function ShoppingCart({ isOpen }) {
         } else {
           setReceiverOrder([]);
         }
-        loadReceiver();
+        console.log("receiver order");
+        receiverService.list().then((res) => {
+          setReceiver(res.data);
+        });
         showOrderModal();
       }
     });
