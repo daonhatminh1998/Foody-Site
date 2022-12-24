@@ -10,6 +10,7 @@ import useLocalStorage from "./hooks/useLocalStorage";
 import orderMemService from "../services/orderMemService";
 import ProductDetailService from "../services/productDetailService";
 import cartService from "../services/cartService";
+import receiverService from "../services/receiverService";
 
 const CartStateContext = createContext();
 export const useCart = () => useContext(CartStateContext);
@@ -40,11 +41,32 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
   const [check, setCheck] = useState([cartItems]);
 
+  const [loadingReceiver, setLoadingReceiver] = useState(false);
+  const [receiver, setReceiver] = useState([]);
+  const loadReceiver = () => {
+    if (isLoggedIn) {
+      ProductDetailService.list().then((res) => {
+        setItems(res.data);
+        setLoadingReceiver(true);
+        console.log("receiver here");
+        receiverService.list().then((res) => {
+          console.log(res);
+          if (res.errorCode === 0) {
+            setLoadingReceiver(false);
+            setReceiver(res.data);
+          }
+        });
+      });
+    } else {
+      ProductDetailService.list().then((res) => {
+        setItems(res.data);
+      });
+    }
+  };
+
   useEffect(() => {
-    ProductDetailService.list().then((res) => {
-      setItems(res.data);
-    });
-  }, [setItems]);
+    loadReceiver();
+  }, [setItems, setReceiver]);
 
   // if (isLoggedIn) {
   //   if (cartItems.length !== 0 && check !== cartItems) {
@@ -296,6 +318,10 @@ export const CartProvider = ({ children }) => {
       value={{
         items,
         // loadData,
+        receiver,
+        loadingReceiver,
+        setReceiver,
+        loadReceiver,
 
         order,
         orderPagingItems,

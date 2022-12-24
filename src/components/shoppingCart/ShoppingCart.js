@@ -31,25 +31,33 @@ import orderMemService from "../../services/orderMemService";
 import { useEffect } from "react";
 
 export function ShoppingCart({ isOpen }) {
-  const { closeCart, cartItems, items, clearCart, removeItem } = useCart();
+  const {
+    closeCart,
+    cartItems,
+    items,
+    clearCart,
+    removeItem,
+    receiver,
+    loadReceiver,
+  } = useCart();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [isWaiting, setIsWaiting] = useState(false);
 
-  const [receiver, setReceiver] = useState([]);
-  const loadReceiver = () => {
-    if (isLoggedIn) {
-      receiverService.list().then((res) => {
-        setReceiver(res.data);
-      });
-    }
-  };
+  // const [receiver, setReceiver] = useState([]);
+  // const loadReceiver = () => {
+  //   if (isLoggedIn) {
+  //     receiverService.list().then((res) => {
+  //       setReceiver(res.data);
+  //     });
+  //   }
+  // };
 
-  useEffect(() => {
-    loadReceiver();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setReceiver]);
+  // useEffect(() => {
+  //   loadReceiver();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [setReceiver]);
 
   //-------------------------Show Customer Modal + Order-------------------------------------------------
   const [customerModal, setCustomerModal] = useState(false);
