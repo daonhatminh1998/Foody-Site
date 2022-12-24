@@ -41,14 +41,13 @@ const User = () => {
 
   // const [receiver, setReceiver] = useState([]);
   const [order, setOrder] = useState([]);
+  const [loadingOrder, setLoadingOrder] = useState(false);
   const [orderPage, setOrderPage] = useState(0);
   const [orderPageLength] = useState(4);
   const [orderPagingItems, setOrderPagingItems] = useState([]);
 
   const [receiver, setReceiver] = useState([]);
   const [loadingReceiver, setLoadingReceiver] = useState(false);
-
-  const [loadingOrder, setLoadingOrder] = useState(false);
 
   const loadReceiver = () => {
     setLoadingReceiver(true);
@@ -283,13 +282,7 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Add Successful");
 
-          setLoadingReceiver(true);
-          receiverService.list().then((res) => {
-            if (res.errorCode === 0) {
-              setLoadingReceiver(false);
-              setReceiver(res.data);
-            }
-          });
+          loadReceiver();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -303,13 +296,7 @@ const User = () => {
         if (res.errorCode === 0) {
           toast.success("Update Successful");
 
-          setLoadingReceiver(true);
-          receiverService.list().then((res) => {
-            if (res.errorCode === 0) {
-              setLoadingReceiver(false);
-              setReceiver(res.data);
-            }
-          });
+          loadReceiver();
           closeReceiverModal();
         } else {
           toast.error(res.message);
@@ -343,13 +330,7 @@ const User = () => {
       if (res.errorCode === 0) {
         toast.success("Delete Successful");
 
-        setLoadingReceiver(true);
-        receiverService.list().then((res) => {
-          if (res.errorCode === 0) {
-            setLoadingReceiver(false);
-            setReceiver(res.data);
-          }
-        });
+        loadReceiver();
       } else {
         toast.error(res.message);
       }
@@ -385,13 +366,7 @@ const User = () => {
     receiverService.defaultReceiver(data.Re_Id).then((res) => {
       if (res.errorCode === 0) {
         toast.success("Change Successful");
-        setLoadingReceiver(true);
-        receiverService.list().then((res) => {
-          if (res.errorCode === 0) {
-            setLoadingReceiver(false);
-            setReceiver(res.data);
-          }
-        });
+        loadReceiver();
 
         closeDefaultModal();
       } else {

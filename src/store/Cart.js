@@ -7,10 +7,9 @@ import { useSelector } from "react-redux";
 import { ShoppingCart } from "../components/shoppingCart/ShoppingCart";
 
 import useLocalStorage from "./hooks/useLocalStorage";
-import orderMemService from "../services/orderMemService";
+
 import ProductDetailService from "../services/productDetailService";
 import cartService from "../services/cartService";
-import receiverService from "../services/receiverService";
 
 const CartStateContext = createContext();
 export const useCart = () => useContext(CartStateContext);
@@ -34,7 +33,6 @@ export const CartProvider = ({ children }) => {
     ProductDetailService.list().then((res) => {
       setItems(res.data);
     });
-    // loadReceiver();
   }, [setItems]);
 
   // if (isLoggedIn) {
