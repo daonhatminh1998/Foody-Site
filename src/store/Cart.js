@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
 
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const [cartItems, setCartItems] = useLocalStorage("shopping-cart", []);
-  const [check, setCheck] = useState([cartItems]);
+  const [check, setCheck] = useState(cartItems);
 
   useEffect(() => {
     ProductDetailService.list().then((res) => {
@@ -34,18 +34,19 @@ export const CartProvider = ({ children }) => {
     });
   }, [setItems]);
 
-  // if (isLoggedIn) {
-  //   if (cartItems.length !== 0 && check !== cartItems) {
-  //     const cart = { cartItem: cartItems };
-  //     setTimeout(function () {
-  //       cartService.updateCart(cart).then((res) => {
-  //         if (res.errorCode === 0) {
-  //           setCheck(cartItems);
-  //         }
-  //       });
-  //     }, 10000);
-  //   }
-  // }
+  if (isLoggedIn) {
+    if (cartItems.length !== 0 && check !== cartItems) {
+      const cart = { cartItem: cartItems };
+      setTimeout(function () {
+        // console.log("up lên back");
+        cartService.updateCart(cart).then((res) => {
+          if (res.errorCode === 0) {
+            setCheck(cartItems);
+          }
+        });
+      }, 10000);
+    }
+  }
 
   //---------------------FrontEnd------------------------------------------
 
